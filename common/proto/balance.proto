@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package balance;
+
+service BalanceService {
+    rpc SendBalance (SendBalanceRequest) returns (SendBalanceResponse);
+}
+
+message SendBalanceRequest {
+    int32 sender_acc = 1;
+    int32 receiver_acc = 2;
+    float amount = 3;
+}
+
+message SendBalanceResponse {
+    bool success = 1;
+    bool message = 2;
+}
+
+message ViewBalanceRequest {
+    int32 account = 1;
+}
+
+message ViewBalanceResponse {
+    float amount = 1;
+}

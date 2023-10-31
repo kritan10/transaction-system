@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package user;
+
+service UserService {
+    rpc GetUserById(GetUserRequest) returns (User);
+    rpc GetUserByAccountNumber(GetUserByAccNumRequest) returns (User);
+    rpc GetUserDataByEmail (GetUserDataByEmailRequest) returns (UserData);
+    rpc CreateUser(CreateUserRequest) returns (User);
+    rpc UpdateUser(UpdateUserRequest) returns (MessageResponse);
+    rpc DeleteUser(DeleteUserRequest) returns (MessageResponse);
+}
+
+message Empty {};
+
+message User {
+    int32 account_number = 1;
+    string name = 2;
+    string email = 3;
+    string balance = 4;
+}
+
+message GetUserRequest {
+    string user_id = 1;
+}
+
+message GetUserByAccNumRequest{
+    int32 acc_num = 1;
+}
+
+message CreateUserRequest {
+    string name = 1;
+    string email = 2;
+    string password = 3;
+}
+
+message UpdateUserRequest {
+    string user_id = 1;
+    string name = 2;
+}
+
+message DeleteUserRequest {
+    string user_id = 1;
+}
+
+message MessageResponse {
+    string message = 1;
+}
+
+message GetUserDataByEmailRequest{
+    string email = 1;
+}
+message UserData{
+    string user_id = 1;
+    string email = 2;
+    string password = 3;
+}

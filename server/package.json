@@ -5,18 +5,20 @@
 	"main": "index.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"start": "node index"
+		"start": "NODE_ENV=development nodemon index"
 	},
+	"type": "module",
 	"author": "kritan",
 	"license": "ISC",
 	"dependencies": {
 		"@grpc/grpc-js": "^1.9.5",
 		"@grpc/proto-loader": "^0.7.10",
+		"bcrypt": "^5.1.1",
 		"dotenv": "^16.3.1",
 		"lodash": "^4.17.21",
 		"mysql2": "^3.6.1",
 		"sequelize": "^6.33.0",
-		"sequelize-cli": "6.6.1",
+		"sequelize-cli": "^6.6.1",
 		"uuid": "^9.0.1"
 	},
 	"devDependencies": {
