@@ -4,6 +4,7 @@ package balance;
 
 service BalanceService {
     rpc SendBalance (SendBalanceRequest) returns (SendBalanceResponse);
+    rpc CreateBalanceAccount (CreateBalanceAccountRequest) returns (CreateBalanceAccountResponse);
 }
 
 message SendBalanceRequest {
@@ -17,10 +18,15 @@ message SendBalanceResponse {
     string message = 2;
 }
 
-message ViewBalanceRequest {
-    int32 account = 1;
+
+message CreateBalanceAccountRequest{
+    string user_id = 1;
+    double amount = 2;
+    string account_type = 3;
 }
 
-message ViewBalanceResponse {
-    float amount = 1;
+message CreateBalanceAccountResponse{
+    int32 account_number = 1;
+    double amount = 2;
+    string account_type = 3;
 }
