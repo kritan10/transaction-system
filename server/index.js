@@ -1,8 +1,8 @@
 import grpc from '@grpc/grpc-js';
 
 import { BalanceService, UserService } from './proto/index.js';
-import { createUser, deleteUser, getUser, updateUser, getUserByAccountNumber, getUserDataByEmail } from './services/user.js';
-import { sendBalanceService } from './services/balance.js';
+import { createUser, deleteUser, getUser, updateUser, getUserByAccountNumber, getUserCredentialsByEmail } from './services/user.js';
+import { sendBalanceService } from './services/account.js';
 
 function main() {
 	var server = new grpc.Server();
@@ -13,7 +13,7 @@ function main() {
 		UpdateUser: updateUser,
 		DeleteUser: deleteUser,
 		GetUserByAccountNumber: getUserByAccountNumber,
-		GetUserDataByEmail: getUserDataByEmail,
+		GetUserDataByEmail: getUserCredentialsByEmail,
 	});
 
 	server.addService(BalanceService, {

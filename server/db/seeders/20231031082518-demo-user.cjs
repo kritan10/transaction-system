@@ -1,7 +1,4 @@
-var v4 = require('uuid').v4;
-
 ('use strict');
-
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
 	async up(queryInterface, Sequelize) {
@@ -9,49 +6,39 @@ module.exports = {
 			'Users',
 			[
 				{
-					id: v4(),
-					account_number: 2001,
+					id: '038f2f29-4de1-4b88-b114-635905a26c4f',
 					name: 'ramu',
 					email: 'ramu@mail.com',
 					password: 'password',
-					balance: '2000',
-					createdAt: new Date(),
+					created_at: new Date(),
 				},
 				{
-					id: v4(),
-					account_number: 2002,
+					id: 'c2885513-fd87-4d42-ac38-21c6926d4d16',
 					name: 'hari',
 					email: 'hari@mail.com',
 					password: 'password',
-					balance: '2500',
-					createdAt: new Date(),
+					created_at: new Date(),
 				},
 				{
-					id: v4(),
-					account_number: 2003,
+					id: 'ccdaf800-0908-4b22-b883-5914b8de0b5c',
 					name: 'sam',
 					email: 'sam@mail.com',
 					password: 'password',
-					balance: '12000',
-					createdAt: new Date(),
+					created_at: new Date(),
 				},
 				{
-					id: v4(),
-					account_number: 2004,
+					id: '9ddd9cda-f064-4b21-8324-e9816a0af47d',
 					name: 'sita',
 					email: 'sita@mail.com',
 					password: 'password',
-					balance: '22000',
-					createdAt: new Date(),
+					created_at: new Date(),
 				},
 				{
-					id: v4(),
-					account_number: 2005,
-					name: 'asdf',
-					email: 'asdf@mail.com',
+					id: 'f61af6c5-570d-4e6a-a54a-6ce476f34e83',
+					name: 'gita',
+					email: 'gita@mail.com',
 					password: 'password',
-					balance: '9000',
-					createdAt: new Date(),
+					created_at: new Date(),
 				},
 			],
 			{}
@@ -59,6 +46,6 @@ module.exports = {
 	},
 
 	async down(queryInterface, Sequelize) {
-		await queryInterface.bulkDelete('Users', null, {});
+		await queryInterface.bulkDelete('Users', {}, {});
 	},
 };

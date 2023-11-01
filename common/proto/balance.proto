@@ -14,7 +14,7 @@ message SendBalanceRequest {
 
 message SendBalanceResponse {
     bool success = 1;
-    bool message = 2;
+    string message = 2;
 }
 
 message ViewBalanceRequest {

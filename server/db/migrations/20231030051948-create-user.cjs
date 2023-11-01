@@ -9,11 +9,6 @@ module.exports = {
 					type: Sequelize.UUID,
 					primaryKey: true,
 				},
-				account_number: {
-					type: Sequelize.INTEGER,
-					unique: true,
-					autoIncrement: true,
-				},
 				name: {
 					type: Sequelize.STRING,
 				},
@@ -24,11 +19,7 @@ module.exports = {
 				password: {
 					type: Sequelize.STRING,
 				},
-				balance: {
-					type: Sequelize.DOUBLE,
-					defaultValue: 0,
-				},
-				createdAt: {
+				created_at: {
 					allowNull: false,
 					type: Sequelize.DATE,
 				},
