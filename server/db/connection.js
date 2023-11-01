@@ -5,26 +5,26 @@ import dotenv from 'dotenv';
 
 dotenv.config({ path: `./.env.${process.env.NODE_ENV}` });
 
-const db_info = `
-    host: ${process.env.DB_HOST}
-    user: ${process.env.DB_USER}
-    password: ${process.env.DB_PASSWORD}
-    database: ${process.env.DB_NAME}
-    port: ${process.env.DB_PORT}`;
-    
-console.log(db_info);
-
-const connection = createConnection({
+const databaseOptions = {
 	host: process.env.DB_HOST,
 	user: process.env.DB_USER,
 	password: process.env.DB_PASSWORD,
 	database: process.env.DB_NAME,
 	port: process.env.DB_PORT,
+};
+
+const connection = createConnection(databaseOptions);
+connection.query('SELECT 1', (err, result, fields) => {
+	if (err) console.log(err);
+	console.log('Database connected');
 });
 
-connection.query('SELECT 1', (err, result, fields) => {
-	if (err) return console.log(err);
-	console.log('\nDatabase Connected');
-});
+// try {
+// 	const [rows, fields] = await connection.query('SELECT 1;');
+// 	// console.log(databaseOptions);
+// 	console.log('Database connected');
+// } catch (err) {
+// 	console.log(err);
+// }
 
 export default connection;

@@ -15,7 +15,7 @@ router.post('/login', async (req, res, next) => {
 	}
 
 	// check if user exists by email
-	client.GetUserDataByEmail({ email: email }, async (err, response) => {
+	client.GetUserCredentialsByEmail({ email: email }, async (err, response) => {
 		if (err) return next(err);
 
 		if (!response.user_id) {

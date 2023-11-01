@@ -21,7 +21,7 @@ async function createUserService(call, callback) {
 		return callback({ message: 'User creation failed' }, null);
 	}
 	if (!result) return callback({ message: 'User creation failed' }, null); // undefined result = error in insert or not inserted
-	const user = await getUserByAccountNumber(result);
+	const user = await getUserById(result);
 	return callback(null, user);
 }
 
@@ -65,11 +65,4 @@ async function deleteUserService(call, callback) {
 	return callback(null, { message: 'User delete successful' });
 }
 
-export {
-	createUserService as createUser,
-	deleteUserService as deleteUser,
-	updateUserService as updateUser,
-	getUserByIdService as getUser,
-	getUserByAccountNumberService as getUserByAccountNumber,
-	getUserCredentialsByEmailService as getUserCredentialsByEmail,
-};
+export { createUserService, deleteUserService, updateUserService, getUserByIdService, getUserByAccountNumberService, getUserCredentialsByEmailService };

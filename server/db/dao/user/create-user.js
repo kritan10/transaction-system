@@ -6,21 +6,21 @@ function createUser(name, email, password, initialAmount, createAccount) {
 		connection.beginTransaction((err) => {
 			if (err) return reject(err);
 			// create user
+			const userId = v4();
 			const statement1 = `
 				INSERT INTO 
-				Users(id, name, email, password, createdAt) 
+				Users(id, name, email, password, created_at) 
 				VALUES (?,?,?,?,?);`;
-			const inserts1 = [v4(), name, email, password, new Date()];
+			const inserts1 = [userId, name, email, password, new Date()];
 			connection.execute(statement1, inserts1, (err, result, fields) => {
 				if (err) return reject(err);
-				const userId = result.insertId;
-				console.log(`--- INSERT // insertId=${result.insertId} // ${result.affectedRows} ROWS INSERTED ---`);
+				console.log(`--- INSERT // insertId=${userId} // ${result.affectedRows} ROWS INSERTED ---`);
 
 				// create account
 				if (createAccount) {
 					const statement2 = `
 						INSERT INTO 
-						Accounts(account_holder, balance, createdAt) 
+						Accounts(account_holder, balance, created_at) 
 						VALUES (?,?,?);`;
 					const inserts2 = [userId, initialAmount, new Date()];
 					connection.execute(statement2, inserts2, (err, result, fields) => {

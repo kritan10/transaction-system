@@ -1,5 +1,4 @@
-import { getBalanceByAccountNumber } from './get-balance-by-account-number.js';
-import { updateBalance } from './update-balance.js';
 import makeTransaction from './make-transaction.js';
+import { createBalanceAccount } from './create-balance-account.js';
 
-export { makeTransaction };
+export { makeTransaction, createBalanceAccount };

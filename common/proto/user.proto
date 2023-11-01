@@ -32,6 +32,8 @@ message CreateUserRequest {
     string name = 1;
     string email = 2;
     string password = 3;
+    optional double initialAmount = 4;
+    optional bool createAccount = 5;
 }
 
 message UpdateUserRequest {
