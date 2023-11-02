@@ -1,8 +1,9 @@
 import express from 'express';
+import process from 'process';
 import { StatusCodes } from 'http-status-codes';
 import jwt from 'jsonwebtoken';
-import { userClient } from '../client/index.js';
 import { compare } from 'bcrypt';
+import { userClient } from '../client/index.js';
 
 const router = express.Router();
 
@@ -26,11 +27,15 @@ router.post('/login', async (req, res, next) => {
 		if (!isPasswordValid) {
 			return res.status(StatusCodes.UNAUTHORIZED).send({ message: 'Incorrect password.' });
 		}
+		console.log(process.env.JWT_KEY);
 		const token = jwt.sign(
 			{
 				user_id: response.user_id,
 			},
-			'myprivatekey'
+			process.env.JWT_KEY,
+			{
+				expiresIn: process.env.JWT_EXPIRY_TIME,
+			}
 		);
 		res.status(StatusCodes.OK).send({ token: token });
 	});
@@ -51,9 +56,9 @@ router.post('/register', async (req, res) => {
 			{
 				user_id: response.user_id,
 			},
-			'myprivatekey',
+			process.env.JWT_KEY,
 			{
-				expiresIn: '7d',
+				expiresIn: process.env.JWT_EXPIRY_TIME,
 			}
 		);
 		return res.status(StatusCodes.OK).send({ token: token });
