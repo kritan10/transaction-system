@@ -1,4 +1,6 @@
+import { DatabaseError, DatabaseErrorCodes } from '../../../errors/index.js';
 import connection from '../../connection.js';
+import Tables from '../../constants/tables.js';
 
 /**
  * this function updates the balance of the provided account.
@@ -7,15 +9,12 @@ import connection from '../../connection.js';
  * @param {number} balance the new balance to update
  * @returns void
  */
-export function updateBalance(account, balance) {
-	return new Promise((resolve, reject) => {
-		const statement = 'UPDATE Accounts SET balance=? WHERE account_number=?;';
-		const inserts = [balance, account];
-		connection.execute(statement, inserts, (err, result, fields) => {
-			if (err) return reject(err);
-			if (result.affectedRows < 1) reject(new Error('Record not updated'));
-			console.log(`--- UPDATE // acc_num = ${account} // ${result.affectedRows} ROWS UPDATED ---`);
-			resolve();
-		});
-	});
+async function updateBalance(account, balance) {
+	const statement = 'UPDATE Accounts SET balance=? WHERE account_number=?;';
+	const inserts = [balance, account];
+	const [rows] = await connection.execute(statement, inserts);
+	if (rows.affectedRows < 1) throw new DatabaseError(DatabaseErrorCodes.UPDATE, Tables.Account);
+	console.log(`--- UPDATE // acc_num = ${account} // ${rows.affectedRows} ROWS UPDATED ---`);
 }
+
+export default updateBalance;

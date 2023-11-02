@@ -1,41 +1,13 @@
+import { DatabaseError, DatabaseErrorCodes } from '../../../errors/index.js';
 import connection from '../../connection.js';
-import { v4 } from 'uuid';
+import Tables from '../../constants/tables.js';
 
-function createUser(name, email, password, initialAmount, createAccount) {
-	return new Promise((resolve, reject) => {
-		connection.beginTransaction((err) => {
-			if (err) return reject(err);
-			// create user
-			const userId = v4();
-			const statement1 = `
-				INSERT INTO 
-				Users(id, name, email, password, created_at) 
-				VALUES (?,?,?,?,?);`;
-			const inserts1 = [userId, name, email, password, new Date()];
-			connection.execute(statement1, inserts1, (err, result, fields) => {
-				if (err) return reject(err);
-				console.log(`--- INSERT // insertId=${userId} // ${result.affectedRows} ROWS INSERTED ---`);
-
-				// create account
-				if (createAccount) {
-					const statement2 = `
-						INSERT INTO 
-						Accounts(account_holder, balance, created_at) 
-						VALUES (?,?,?);`;
-					const inserts2 = [userId, initialAmount, new Date()];
-					connection.execute(statement2, inserts2, (err, result, fields) => {
-						if (err) return reject(err);
-						console.log(`--- INSERT // insertId=${result.insertId} // ${result.affectedRows} ROWS INSERTED ---`);
-					});
-				}
-
-				connection.commit(function (err) {
-					if (err) return reject(err);
-					resolve(userId);
-				});
-			});
-		});
-	});
+async function createUser(id, name, email, password) {
+	const statement = 'INSERT INTO Users(id, name, email, password, created_at) VALUES (?,?,?,?,?);';
+	const inserts = [id, name, email, password, new Date()];
+	const [rows] = await connection.execute(statement, inserts);
+	if (!rows.affectedRows) throw new DatabaseError(DatabaseErrorCodes.INSERT, Tables.User);
+	console.log(`--- INSERT // insertId=${id} // ${rows.affectedRows} ROWS INSERTED ---`);
 }
 
 export default createUser;
