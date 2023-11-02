@@ -14,10 +14,10 @@ service UserService {
 message Empty {};
 
 message User {
-    int32 account_number = 1;
+    optional int32 account_number = 1;
     string name = 2;
     string email = 3;
-    string balance = 4;
+    optional string balance = 4;
 }
 
 message GetUserRequest {

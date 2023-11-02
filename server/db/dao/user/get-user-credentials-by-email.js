@@ -7,7 +7,7 @@ async function getUserCredentialsByEmail(email) {
 		WHERE email=?;`;
 	const inserts = [email];
 	const [rows] = await connection.execute(statement, inserts);
-	console.log(`--- SELECT // ${result[0]} ---`);
+	console.log(`--- SELECT // ${rows[0]} ---`);
 	return rows[0];
 }
 

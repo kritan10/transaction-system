@@ -13,10 +13,10 @@ async function sendBalanceService(call, callback) {
 		await createTransactionLog(senderAccount, receiverAccount, transactionAmount);
 		await sendTransactionCompleteMail();
 		await connection.commit();
-		callback(null, { success: true, message: 'Balance transfer success' });
+		return callback(null, { success: true, message: 'Balance transfer success' });
 	} catch (error) {
 		await connection.rollback();
-		callback({ message: 'Error' });
+		return callback({ message: 'Error' });
 	}
 }
 

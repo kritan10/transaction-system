@@ -34,7 +34,7 @@ module.exports = {
 				field: 'account_number',
 			},
 			onUpdate: 'CASCADE',
-			onDelete: 'NO ACTION',
+			onDelete: 'CASCADE',
 		});
 
 		await queryInterface.addConstraint('Transactions', {
@@ -46,7 +46,7 @@ module.exports = {
 				field: 'account_number',
 			},
 			onUpdate: 'CASCADE',
-			onDelete: 'NO ACTION',
+			onDelete: 'CASCADE',
 		});
 	},
 

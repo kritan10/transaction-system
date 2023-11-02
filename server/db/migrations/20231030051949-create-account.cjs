@@ -39,7 +39,7 @@ module.exports = {
 				field: 'id',
 			},
 			onUpdate: 'CASCADE',
-			onDelete: 'NO ACTION',
+			onDelete: 'CASCADE',
 		});
 	},
 
