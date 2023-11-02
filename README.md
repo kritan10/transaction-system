@@ -5,7 +5,7 @@ The API allows users to create accounts and exchange balance between each other.
 
 ## Features
 
--   transaction system to exchange balance between users
+-   transaction system to send and recieve balance between users
 -   authentication using JWT
 -   password hashing and encryption using bcrypt
 -   data storage using mysql and sequelize
@@ -14,8 +14,9 @@ The API allows users to create accounts and exchange balance between each other.
 
 ## TODO
 
--   add endpoints for balance exchange in gateway
--   add feature to load balance
--   separate user and account logic (too much work)
--   add feature to get transaction history for user
--   add queuing feature
+-   [X] separate user and account tables
+-   [X] migrate from mysql2 to mysql2/promise
+-   [ ] add feature to load balance
+-   [ ] add endpoints for balance transaction in gateway
+-   [ ] add feature to get transaction history for user
+-   [ ] add queuing feature
