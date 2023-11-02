@@ -1,4 +1,5 @@
 import { createBalanceAccount, makeTransaction } from '../db/dao/account/index.js';
+import { sendTransactionCompleteMail } from './emailer.js';
 
 async function sendBalanceService(call, callback) {
 	const { sender_acc, receiver_acc, amount } = call.request;
@@ -6,6 +7,8 @@ async function sendBalanceService(call, callback) {
 
 	const transaction = await makeTransaction(sender_acc, receiver_acc, amount);
 	if (!transaction) return callback({ message: 'Something went wrong' });
+
+	await sendTransactionCompleteMail();
 	callback(null, { success: true, message: 'Balance transfer success' });
 }
 
@@ -16,7 +19,7 @@ async function createBalanceAccountService(call, callback) {
 	const account_number = await createBalanceAccount(user_id, account_type, amount);
 	if (!account_number) return callback({ message: 'Error creating account' });
 
-	callback(null, {})
+	callback(null, {});
 }
 
 export { sendBalanceService, createBalanceAccountService };

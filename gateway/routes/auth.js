@@ -1,7 +1,7 @@
 import express from 'express';
 import { StatusCodes } from 'http-status-codes';
 import jwt from 'jsonwebtoken';
-import { client } from '../client/index.js';
+import { userClient } from '../client/index.js';
 import { compare } from 'bcrypt';
 
 const router = express.Router();
@@ -13,9 +13,8 @@ router.post('/login', async (req, res, next) => {
 	if (!email || !password) {
 		return res.status(StatusCodes.BAD_REQUEST).send({ message: 'Invalid request' });
 	}
-
 	// check if user exists by email
-	client.GetUserCredentialsByEmail({ email: email }, async (err, response) => {
+	userClient.GetUserCredentialsByEmail({ email: email }, async (err, response) => {
 		if (err) return next(err);
 
 		if (!response.user_id) {
@@ -38,21 +37,27 @@ router.post('/login', async (req, res, next) => {
 });
 
 router.post('/register', async (req, res) => {
-	const { name, email, password } = req.body;
-
-	const user = await client.createUser(name, email, password);
-
-	const token = jwt.sign(
-		{
-			user_id: user.id,
-		},
-		'myprivatekey',
-		{
-			expiresIn: '7d',
+	const { name, email, password, initialAmount, createAccount } = req.body;
+	if (!(name && email && password)) {
+		return res.status(StatusCodes.BAD_REQUEST).send({ message: 'Missing params' });
+	}
+	const params = { name: name, email: email, password: password, initialAmount: initialAmount, createAccount: createAccount };
+	userClient.CreateUser(params, (err, response) => {
+		if (err) {
+			console.log(err);
+			return res.status(StatusCodes.BAD_REQUEST).send({ message: 'Error creating account' });
 		}
-	);
-
-	res.status(StatusCodes.OK).send({ token: token });
+		const token = jwt.sign(
+			{
+				user_id: response.user_id,
+			},
+			'myprivatekey',
+			{
+				expiresIn: '7d',
+			}
+		);
+		return res.status(StatusCodes.OK).send({ token: token });
+	});
 });
 
 export { router as authRouter };
