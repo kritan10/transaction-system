@@ -4,7 +4,6 @@ import Tables from '../../constants/tables.js';
 
 /**
  * this function updates the balance of the provided account.
- * it is promise based, so make sure to handle errors and rollbacks for transaction
  * @param {number} account the account to update
  * @param {number} balance the new balance to update
  * @returns void

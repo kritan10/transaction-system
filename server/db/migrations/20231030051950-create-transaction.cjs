@@ -14,15 +14,19 @@ module.exports = {
 			receiver: {
 				type: Sequelize.INTEGER,
 			},
-			transaction_amount: {
+			amount: {
 				type: Sequelize.DOUBLE,
 				allowNull: false,
+			},
+			type: {
+				type: Sequelize.ENUM('transfer', 'load'),
 			},
 			status: {
 				type: Sequelize.ENUM('pending', 'success', 'failed'),
 			},
 			otp: {
 				type: Sequelize.STRING,
+				allowNull: true,
 			},
 			created_at: {
 				type: Sequelize.DATE,

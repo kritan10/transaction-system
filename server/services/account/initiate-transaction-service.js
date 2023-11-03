@@ -9,7 +9,7 @@ async function initiateTransactionService(call, callback) {
 	try {
 		const transactionId = v4();
 		const otp = generateOTP();
-		await createTransaction(transactionId, senderAccount, receiverAccount, transactionAmount, otp);
+		await createTransaction(transactionId, senderAccount, receiverAccount, transactionAmount, 'pending', otp, 'transfer');
 		return callback(null, { transaction_id: transactionId });
 	} catch (error) {
 		if (error instanceof TransactionError) {

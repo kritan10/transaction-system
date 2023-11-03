@@ -5,7 +5,8 @@
 	"main": "index.js",
 	"scripts": {
 		"test": "mocha",
-		"start": "NODE_ENV=development nodemon index"
+		"start": "NODE_ENV=development nodemon index",
+		"reset_db": "npx sequelize-cli db:migrate:undo:all && npx sequelize-cli db:migrate && npx sequelize-cli db:seed:all  "
 	},
 	"type": "module",
 	"author": "kritan",

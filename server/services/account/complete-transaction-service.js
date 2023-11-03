@@ -11,14 +11,15 @@ async function completeTransactionService(call, callback) {
 		const transaction = await getTransactionDetailsById(transaction_id);
 		await verifyTransactionStatus(transaction);
 		await verifyTransactionOTP(otp, transaction.otp);
-		await decreaseSenderBalance(transaction.sender, transaction.transaction_amount);
-		await increaseReceiverBalance(transaction.receiver, transaction.transaction_amount);
+		await decreaseSenderBalance(transaction.sender, transaction.amount);
+		await increaseReceiverBalance(transaction.receiver, transaction.amount);
 		await updateTransactionStatus(transaction_id, 'success');
 		await connection.commit();
 		// await sendTransactionCompleteMail();
 		return callback(null, { success: true, message: 'Balance transfer success' });
 	} catch (error) {
 		await connection.rollback();
+		console.log(error);
 		return callback({ message: error.message });
 	}
 }
@@ -41,7 +42,7 @@ async function increaseReceiverBalance(account_number, amount) {
  */
 async function decreaseSenderBalance(account_number, amount) {
 	const { balance: currentBalance } = await getBalanceByAccountNumber(account_number); // fetch sender's current balance
-	if (currentBalance < amount) throw new Error('Not enough balance'); // cant complete transaction if current balance is less than sending balance
+	if (currentBalance < amount) throw new TransactionError(TransactionErrorCodes.INSUFFICIENT_BALANCE); // cant complete transaction if current balance is less than sending balance
 	const newBalance = currentBalance - amount; // decrease balance
 	await updateBalance(account_number, newBalance); // update balance
 }

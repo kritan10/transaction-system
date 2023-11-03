@@ -21,6 +21,10 @@ class TransactionError extends Error {
 				this.message = 'This transaction is already completed. It cannot be modified.';
 				break;
 
+			case TransactionErrorCodes.INSUFFICIENT_BALANCE:
+				this.message = 'Insufficient balance.';
+				break;
+
 			default:
 				this.message = 'custom message';
 				break;
