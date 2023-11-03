@@ -30,9 +30,9 @@ class DatabaseError extends Error {
 				break;
 
 			default:
+				this.message = 'custom message';
 				break;
 		}
-		this.message = 'custom message';
 	}
 }
 

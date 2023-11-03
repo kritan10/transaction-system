@@ -2,8 +2,7 @@ import grpc from '@grpc/grpc-js';
 
 import { BalanceService, UserService } from './proto/index.js';
 import { createUser, deleteUser, updateUser, getUserById, getUserByAccountNumber, getUserCredentialsByEmail } from './services/user/index.js';
-
-import { createBalanceAccount, sendBalance } from './services/account/index.js';
+import { createBalanceAccount, completeTransaction, initiateTransaction, loadBalance } from './services/account/index.js';
 
 function main() {
 	var server = new grpc.Server();
@@ -18,7 +17,9 @@ function main() {
 	});
 
 	server.addService(BalanceService, {
-		SendBalance: sendBalance,
+		InitiateTransaction: initiateTransaction,
+		LoadBalance: loadBalance,
+		CompleteTransaction: completeTransaction,
 		CreateBalanceAccount: createBalanceAccount,
 	});
 

@@ -1,13 +1,11 @@
 import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
-	host: 'smtp.forwardemail.net',
-	port: 465,
-	secure: true,
+	host: 'sandbox.smtp.mailtrap.io',
+	port: 2525,
 	auth: {
-		// TODO: replace `user` and `pass` values from <https://forwardemail.net>
-		user: 'REPLACE-WITH-YOUR-ALIAS@YOURDOMAIN.COM',
-		pass: 'REPLACE-WITH-YOUR-GENERATED-PASSWORD',
+		user: 'b6c6a935967eb5',
+		pass: 'dbd4debfbec93d',
 	},
 });
 

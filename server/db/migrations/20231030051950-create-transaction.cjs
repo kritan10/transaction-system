@@ -5,9 +5,8 @@ module.exports = {
 		await queryInterface.createTable('Transactions', {
 			id: {
 				allowNull: false,
-				autoIncrement: true,
 				primaryKey: true,
-				type: Sequelize.INTEGER,
+				type: Sequelize.UUID,
 			},
 			sender: {
 				type: Sequelize.INTEGER,
@@ -18,6 +17,12 @@ module.exports = {
 			transaction_amount: {
 				type: Sequelize.DOUBLE,
 				allowNull: false,
+			},
+			status: {
+				type: Sequelize.ENUM('pending', 'success', 'failed'),
+			},
+			otp: {
+				type: Sequelize.STRING,
 			},
 			created_at: {
 				type: Sequelize.DATE,

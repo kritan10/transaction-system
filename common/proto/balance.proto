@@ -3,19 +3,20 @@ syntax = "proto3";
 package balance;
 
 service BalanceService {
-    rpc SendBalance (SendBalanceRequest) returns (SendBalanceResponse);
+    rpc InitiateTransaction (InitiateTransactionRequest) returns (InitiateTransactionResponse);
+    rpc LoadBalance (LoadBalanceRequest) returns (LoadBalanceResponse);
+    rpc CompleteTransaction (CompleteTransactionRequest) returns (CompleteTransactionResponse);
     rpc CreateBalanceAccount (CreateBalanceAccountRequest) returns (CreateBalanceAccountResponse);
 }
 
-message SendBalanceRequest {
+message InitiateTransactionRequest {
     int32 sender_acc = 1;
     int32 receiver_acc = 2;
     float amount = 3;
 }
 
-message SendBalanceResponse {
-    bool success = 1;
-    string message = 2;
+message InitiateTransactionResponse {
+    string transaction_id = 1;
 }
 
 
@@ -29,4 +30,26 @@ message CreateBalanceAccountResponse{
     int32 account_number = 1;
     double amount = 2;
     string account_type = 3;
+}
+
+
+message LoadBalanceRequest{
+    int32 account_number = 1;
+    double amount = 2;
+}
+
+message LoadBalanceResponse{
+    int32 account_number = 1;
+    double balance = 2;
+}
+
+
+message CompleteTransactionRequest{
+    string transaction_id = 1;
+    string otp = 2;
+}
+
+message CompleteTransactionResponse{
+    bool success = 1;
+    string message = 2;
 }
