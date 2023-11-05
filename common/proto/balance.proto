@@ -7,6 +7,7 @@ service BalanceService {
     rpc LoadBalance (LoadBalanceRequest) returns (LoadBalanceResponse);
     rpc CompleteTransaction (CompleteTransactionRequest) returns (CompleteTransactionResponse);
     rpc CreateBalanceAccount (CreateBalanceAccountRequest) returns (CreateBalanceAccountResponse);
+    rpc GetTransactionHistoryByUser (GetTransactionHistoryRequest) returns (GetTransactionHistoryResponse);
 }
 
 message InitiateTransactionRequest {
@@ -54,4 +55,22 @@ message CompleteTransactionRequest{
 message CompleteTransactionResponse{
     bool success = 1;
     string message = 2;
+}
+
+
+message Transaction {
+    int32 receiver_acc = 1;
+    float amount = 2;
+    string date_of_transaction = 3;
+    string status = 4;
+}
+
+message GetTransactionHistoryRequest{
+    string from_date = 1;
+    string to_date = 2;
+    string user_id = 3;
+}
+
+message GetTransactionHistoryResponse{
+    repeated Transaction transactions = 1;
 }

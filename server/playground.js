@@ -1,21 +1,9 @@
-function myFunc() {
-	throw new Error("this is error")
+function parseDate(){
+	const string = '2012-12-23'
+	const date = Date.parse(string)
+	const mDate = new Date(date)
+	mDate.setHours(23,59,59)
+
 }
 
-function myFuncTwo() {
-	return new Promise((resolve, reject) => {
-		resolve('Done');
-	});
-}
-
-async function main() {
-	try {
-        const a = await myFuncTwo()
-        console.log(a);
-		await myFunc();
-	} catch (error) {
-		console.log(error.message);
-	}
-}
-
-main();
+parseDate()

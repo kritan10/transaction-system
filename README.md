@@ -14,10 +14,11 @@ The API allows users to create accounts and exchange balance between each other.
 
 ## TODO
 
--   [X] separate user and account tables
--   [X] migrate from mysql2 to mysql2/promise
--   [X] add otp feature for transaction
--   [X] add feature to load balance
--   [ ] add endpoints for balance transaction in gateway
--   [ ] add feature to get transaction history for user
+-   [x] separate user and account tables
+-   [x] migrate from mysql2 to mysql2/promise
+-   [x] add otp feature for transaction
+-   [x] add feature to load balance
+-   [x] add endpoints for balance transaction in gateway
+-   [x] add feature to fail transaction if wrong otp is provided for 3 time
+-   [x] add feature to get transaction history for user
 -   [ ] add queuing feature
