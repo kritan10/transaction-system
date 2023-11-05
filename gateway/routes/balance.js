@@ -4,9 +4,10 @@ import { StatusCodes } from 'http-status-codes';
 import { authMiddleware } from '../middleware/auth.js';
 
 const router = express.Router();
+
 router.use(authMiddleware);
 
-router.get('/transfer', (req, res, next) => {
+router.get('/transfer/initiate', (req, res, next) => {
 	const { senderAccount, receiverAccount, amount } = req.body;
 
 	if (!(senderAccount && receiverAccount && amount)) {
@@ -19,7 +20,44 @@ router.get('/transfer', (req, res, next) => {
 		amount: amount,
 	};
 
-	balanceClient.SendBalance(params, (err, response) => {
+	balanceClient.InitiateTransaction(params, (err, response) => {
+		if (err) {
+			res.status(StatusCodes.INTERNAL_SERVER_ERROR);
+		}
+		res.status(StatusCodes.OK).send(response);
+	});
+});
+
+router.get('/transfer/verify', (req, res, next) => {
+	const { transactionId, otp } = req.body;
+
+	if (!(transactionId && otp)) {
+		res.status(StatusCodes.BAD_REQUEST).send({ message: 'Invalid request' });
+	}
+
+	const params = {
+		transaction_id: transactionId,
+		otp: otp,
+	};
+
+	balanceClient.CompleteTransaction(params, (err, response) => {
+		if (err) return next(err);
+		res.status(StatusCodes.OK).send(response);
+	});
+});
+
+router.get('/load', (req, res, next) => {
+	const { accountNumber, amount } = req.body;
+	if (!(accountNumber && amount)) {
+		res.status(StatusCodes.BAD_REQUEST).send({ message: 'Invalid request' });
+	}
+
+	const params = {
+		account_number: accountNumber,
+		amount: amount,
+	};
+
+	balanceClient.LoadBalance(params, (err, response) => {
 		if (err) return next(err);
 		res.status(StatusCodes.OK).send(response);
 	});

@@ -1,9 +1,8 @@
 import express from 'express';
 import { StatusCodes } from 'http-status-codes';
 import morgan from 'morgan';
-import { authRouter } from './routes/auth.js';
-import { userRouter } from './routes/user.js';
 import dotenv from 'dotenv';
+import { authRouter, balanceRouter, userRouter } from './routes/index.js';
 
 const app = express();
 
@@ -15,6 +14,7 @@ app.use(morgan('combined'));
 
 app.use('/', authRouter);
 app.use('/user', userRouter);
+app.use('/balance', balanceRouter);
 
 app.get('/hello', (req, res) => {
 	res.status(StatusCodes.OK).send({ message: 'hello world' });
