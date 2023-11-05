@@ -1,16 +1,16 @@
 import connection from '../../db/connection.js';
 import { getBalanceByAccountNumber, updateBalance } from '../../db/dao/account/index.js';
-import { getTransactionDetailsById, updateTransactionStatus } from '../../db/dao/transaction/index.js';
+import { getTransactionDetailsById, updateTransactionRetries, updateTransactionStatus } from '../../db/dao/transaction/index.js';
 import { TransactionErrorCodes, TransactionError } from '../../errors/index.js';
 
 async function completeTransactionService(call, callback) {
 	const { transaction_id, otp } = call.request;
-
+	let transaction;
 	try {
 		await connection.beginTransaction();
-		const transaction = await getTransactionDetailsById(transaction_id);
+		transaction = await getTransactionDetailsById(transaction_id);
 		await verifyTransactionStatus(transaction);
-		await verifyTransactionOTP(otp, transaction.otp);
+		await verifyTransactionOTP(otp, transaction.otp, transaction.id, transaction.otp_retries);
 		await decreaseSenderBalance(transaction.sender, transaction.amount);
 		await increaseReceiverBalance(transaction.receiver, transaction.amount);
 		await updateTransactionStatus(transaction_id, 'success');
@@ -19,7 +19,15 @@ async function completeTransactionService(call, callback) {
 		return callback(null, { success: true, message: 'Balance transfer success' });
 	} catch (error) {
 		await connection.rollback();
-		console.log(error);
+		if (error instanceof TransactionError && error.code === TransactionErrorCodes.INVALID_OTP) {
+			await increaseOtpRetries(transaction.id, transaction.otp_retries);
+		}
+		if (error instanceof TransactionError && error.code === TransactionErrorCodes.OTP_LIMIT_REACHED) {
+			await updateTransactionStatus(transaction.id, 'failed');
+		}
+		if (error instanceof TransactionError) {
+			return callback({ message: error.message });
+		}
 		return callback({ message: error.message });
 	}
 }
@@ -53,7 +61,9 @@ async function decreaseSenderBalance(account_number, amount) {
  * @param {number} actualOTP the OTP code that is stored in the database
  */
 async function verifyTransactionOTP(userOTP, actualOTP) {
-	if (userOTP.toString() !== actualOTP.toString()) throw new TransactionError(TransactionErrorCodes.INVALID_OTP);
+	if (userOTP.toString() === actualOTP.toString()) return;
+
+	throw new TransactionError(TransactionErrorCodes.INVALID_OTP);
 }
 
 /**
@@ -66,6 +76,12 @@ async function verifyTransactionStatus(transaction) {
 	if (!transaction) throw new TransactionError(TransactionErrorCodes.NOT_FOUND);
 
 	if (transaction.status !== 'pending') throw new TransactionError(TransactionErrorCodes.NOT_ALLOWED);
+
+	if (transaction.otp_retries >= 2) throw new TransactionError(TransactionErrorCodes.OTP_LIMIT_REACHED);
+}
+
+async function increaseOtpRetries(transactionId, otpRetries) {
+	await updateTransactionRetries(transactionId, otpRetries + 1);
 }
 
 export default completeTransactionService;

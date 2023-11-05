@@ -7,7 +7,7 @@ class TransactionError extends Error {
 	constructor(code) {
 		super();
 		this.code = code;
-		this.name = 'Database Error';
+		this.name = 'Transaction Error';
 		switch (code) {
 			case TransactionErrorCodes.INVALID_OTP:
 				this.message = `Invalid OTP.`;
@@ -18,15 +18,23 @@ class TransactionError extends Error {
 				break;
 
 			case TransactionErrorCodes.NOT_ALLOWED:
-				this.message = 'This transaction is already completed. It cannot be modified.';
+				this.message = 'This method is not allowed for this transaction.';
 				break;
 
 			case TransactionErrorCodes.INSUFFICIENT_BALANCE:
 				this.message = 'Insufficient balance.';
 				break;
 
+			case TransactionErrorCodes.OTP_LIMIT_REACHED:
+				this.message = 'You have reached OTP tries limit. This transaction is now cancelled.';
+				break;
+
+			case TransactionErrorCodes.INVALID_RECEIVER:
+				this.message = 'This receiver does not exist.';
+				break;
+
 			default:
-				this.message = 'custom message';
+				this.message = 'message not implemented';
 				break;
 		}
 	}
