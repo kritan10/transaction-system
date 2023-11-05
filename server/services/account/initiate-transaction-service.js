@@ -1,6 +1,7 @@
 import { v4 } from 'uuid';
 import { createTransaction } from '../../db/dao/transaction/index.js';
 import { TransactionError, TransactionErrorCodes } from '../../errors/index.js';
+import { getAccountByAccountNumber, getBalanceByAccountNumber } from '../../db/dao/account/index.js';
 
 async function initiateTransactionService(call, callback) {
 	const { sender_acc: senderAccount, receiver_acc: receiverAccount, amount: transactionAmount } = call.request;
@@ -9,11 +10,13 @@ async function initiateTransactionService(call, callback) {
 	try {
 		const transactionId = v4();
 		const otp = generateOTP();
+		await validateReceiverAccount(receiverAccount);
+		await validateAmount(senderAccount, transactionAmount);
 		await createTransaction(transactionId, senderAccount, receiverAccount, transactionAmount, 'pending', otp, 'transfer');
 		return callback(null, { transaction_id: transactionId });
 	} catch (error) {
 		if (error instanceof TransactionError) {
-			return callback({ message: error.message });
+			return callback({ message: error.message, code: error.code });
 		}
 		return callback({ message: 'Transaction failed' });
 	}
@@ -23,6 +26,27 @@ function generateOTP() {
 	return Math.floor(Math.random() * 1000000)
 		.toString()
 		.padStart(6, '0');
+}
+
+/**
+ * This method checks if the receiver account exists in the database.
+ * @param {number} receiver the account number of the receiver
+ * @throws {TransactionError} if user is not found
+ */
+async function validateReceiverAccount(receiver) {
+	const account = await getAccountByAccountNumber(receiver);
+	if (!account) throw new TransactionError(TransactionErrorCodes.INVALID_RECEIVER);
+}
+
+/**
+ * This method checks whether the requested amount to transfer is valid or not.
+ * @param {number} sender the account number of the sender
+ * @param {number} amount the amount to be sent
+ * @throws {TransactionError} if the amount to be sent is greater than sender's current balance
+ */
+async function validateAmount(sender, amount) {
+	const { balance } = await getBalanceByAccountNumber(sender);
+	if (balance < amount) throw new TransactionError(TransactionErrorCodes.INSUFFICIENT_BALANCE);
 }
 
 export default initiateTransactionService;
