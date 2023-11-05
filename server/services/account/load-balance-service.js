@@ -14,7 +14,6 @@ async function loadBalanceService(call, callback) {
 		await createTransaction(v4(), account_number, account_number, amount, 'success', null, 'load');
 		connection.commit();
 		const updatedAccount = await getBalanceByAccountNumber(account_number);
-        console.log(updatedAccount);
 		callback(null, {
 			account_number: account_number,
 			balance: updatedAccount.balance,

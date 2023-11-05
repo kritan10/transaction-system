@@ -21,8 +21,9 @@ router.get('/transfer/initiate', (req, res, next) => {
 	};
 
 	balanceClient.InitiateTransaction(params, (err, response) => {
+		console.log(err);
 		if (err) {
-			res.status(StatusCodes.INTERNAL_SERVER_ERROR);
+			return res.status(StatusCodes.BAD_REQUEST).send({ message: err.message });
 		}
 		res.status(StatusCodes.OK).send(response);
 	});
@@ -41,7 +42,11 @@ router.get('/transfer/verify', (req, res, next) => {
 	};
 
 	balanceClient.CompleteTransaction(params, (err, response) => {
-		if (err) return next(err);
+		console.log(err);
+		if (err) {
+			console.log(err.details);
+			return res.status(StatusCodes.BAD_REQUEST).send({ message: err.message });
+		}
 		res.status(StatusCodes.OK).send(response);
 	});
 });
