@@ -1,24 +1,28 @@
 import { v4 } from 'uuid';
 import { createTransaction } from '../../db/dao/transaction/index.js';
-import { TransactionError, TransactionErrorCodes } from '../../errors/index.js';
+import { RequestError, TransactionError, TransactionErrorCodes, customErrorHandler } from '../../errors/index.js';
 import { getAccountByAccountNumber, getBalanceByAccountNumber } from '../../db/dao/account/index.js';
 
 async function initiateTransactionService(call, callback) {
 	const { sender_acc: senderAccount, receiver_acc: receiverAccount, amount: transactionAmount } = call.request;
-	if (!senderAccount || !receiverAccount || !transactionAmount) return callback({ message: 'Missing fields' });
 
 	try {
+		if (!senderAccount || !receiverAccount || !transactionAmount) throw new RequestError(RequestError.MISSING_PARAMS);
 		const transactionId = v4();
 		const otp = generateOTP();
 		await validateReceiverAccount(receiverAccount);
 		await validateAmount(senderAccount, transactionAmount);
 		await createTransaction(transactionId, senderAccount, receiverAccount, transactionAmount, 'pending', otp, 'transfer');
-		return callback(null, { transaction_id: transactionId });
+		return callback(null, {
+			transaction_id: transactionId,
+			meta: {
+				code: 1,
+				status: 'OK',
+				message: 'Transaction initiation success.',
+			},
+		});
 	} catch (error) {
-		if (error instanceof TransactionError) {
-			return callback({ message: error.message, code: error.code });
-		}
-		return callback({ message: 'Transaction failed' });
+		customErrorHandler(error, callback);
 	}
 }
 

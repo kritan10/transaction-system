@@ -1,19 +1,24 @@
 import { getTransactionDetailsByDate } from '../../db/dao/transaction/index.js';
+import { RequestError, customErrorHandler } from '../../errors/index.js';
 
 async function getTransactionHistoryService(call, callback) {
 	const { user_id: userId, from_date: fromDate, to_date: toDate } = call.request;
-	if (!userId) return callback({ message: 'user id not provided' });
+	try {
+		if (!userId) throw new RequestError(RequestError.MISSING_PARAMS);
 
-	const transactions = await getTransactionDetailsByDate(userId, parseDate(fromDate, 'from'), parseDate(toDate, 'to'));
-	const mTransactions = transactions.map((t) => {
-		return {
-			receiver_acc: t.receiver,
-			amount: t.amount,
-			date_of_transaction: t.created_at,
-			status: t.status,
-		};
-	});
-	return callback(null, { transactions: mTransactions });
+		const transactions = await getTransactionDetailsByDate(userId, parseDate(fromDate, 'from'), parseDate(toDate, 'to'));
+		const mTransactions = transactions.map((t) => {
+			return {
+				receiver_acc: t.receiver,
+				amount: t.amount,
+				date_of_transaction: t.created_at,
+				status: t.status,
+			};
+		});
+		return callback(null, { transactions: mTransactions });
+	} catch (error) {
+		return customErrorHandler(error, callback);
+	}
 }
 
 /**

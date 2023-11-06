@@ -1,12 +1,13 @@
 import connection from '../../db/connection.js';
 import { getBalanceByAccountNumber, updateBalance } from '../../db/dao/account/index.js';
 import { getTransactionDetailsById, updateTransactionRetries, updateTransactionStatus } from '../../db/dao/transaction/index.js';
-import { TransactionErrorCodes, TransactionError } from '../../errors/index.js';
+import { TransactionErrorCodes, TransactionError, customErrorHandler, RequestError } from '../../errors/index.js';
 
 async function completeTransactionService(call, callback) {
 	const { transaction_id, otp } = call.request;
 	let transaction;
 	try {
+		if (!transaction_id || !otp) throw new RequestError(RequestError.MISSING_PARAMS);
 		await connection.beginTransaction();
 		transaction = await getTransactionDetailsById(transaction_id);
 		await verifyTransactionStatus(transaction);
@@ -16,7 +17,18 @@ async function completeTransactionService(call, callback) {
 		await updateTransactionStatus(transaction_id, 'success');
 		await connection.commit();
 		// await sendTransactionCompleteMail();
-		return callback(null, { success: true, message: 'Balance transfer success' });
+
+		return callback(null, {
+			from: transaction.sender,
+			to: transaction.receiver,
+			amount: transaction.amount,
+			transaction_date: transaction.created_at,
+			meta: {
+				status: 'OK',
+				code: 1,
+				message: 'Balance transferred succesfully',
+			},
+		});
 	} catch (error) {
 		await connection.rollback();
 		if (error instanceof TransactionError && error.code === TransactionErrorCodes.INVALID_OTP) {
@@ -25,10 +37,7 @@ async function completeTransactionService(call, callback) {
 		if (error instanceof TransactionError && error.code === TransactionErrorCodes.OTP_LIMIT_REACHED) {
 			await updateTransactionStatus(transaction.id, 'failed');
 		}
-		if (error instanceof TransactionError) {
-			return callback({ message: error.message });
-		}
-		return callback({ message: error.message });
+		return customErrorHandler(error, callback);
 	}
 }
 

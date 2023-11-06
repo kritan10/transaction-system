@@ -3,6 +3,7 @@ import grpc from '@grpc/grpc-js';
 import { BalanceService, UserService } from './proto/index.js';
 import { createUser, deleteUser, updateUser, getUserById, getUserByAccountNumber, getUserCredentialsByEmail } from './services/user/index.js';
 import { createBalanceAccount, completeTransaction, initiateTransaction, loadBalance, getTransactionHistory } from './services/account/index.js';
+import customErrorHandler from './errors/error-handler.js';
 
 function main() {
 	var server = new grpc.Server();

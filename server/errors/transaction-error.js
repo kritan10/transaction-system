@@ -10,11 +10,11 @@ class TransactionError extends Error {
 		this.name = 'Transaction Error';
 		switch (code) {
 			case TransactionErrorCodes.INVALID_OTP:
-				this.message = `Invalid OTP.`;
+				this.message = `Incorrect OTP. Try again.`;
 				break;
 
 			case TransactionErrorCodes.NOT_FOUND:
-				this.message = `Invalid transaction ID`;
+				this.message = `Transaction not found.`;
 				break;
 
 			case TransactionErrorCodes.NOT_ALLOWED:

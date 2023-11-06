@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package common;
+
+message ResponseMeta{
+    int32 code = 1;
+    string status = 2;
+    string message = 3;
+}

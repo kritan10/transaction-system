@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "common.proto";
+
 package user;
 
 service UserService {
@@ -14,10 +16,11 @@ service UserService {
 message Empty {};
 
 message User {
-    optional int32 account_number = 1;
+     int32 account_number = 1;
     string name = 2;
     string email = 3;
-    optional string balance = 4;
+     string balance = 4;
+    ResponseMeta meta = 5;
 }
 
 message GetUserRequest {
@@ -32,8 +35,8 @@ message CreateUserRequest {
     string name = 1;
     string email = 2;
     string password = 3;
-    optional double initialAmount = 4;
-    optional bool createAccount = 5;
+     double initialAmount = 4;
+     bool createAccount = 5;
 }
 
 message UpdateUserRequest {
@@ -47,6 +50,7 @@ message DeleteUserRequest {
 
 message MessageResponse {
     string message = 1;
+    ResponseMeta meta = 5;
 }
 
 message GetUserDataByEmailRequest{
@@ -56,4 +60,6 @@ message UserData{
     string user_id = 1;
     string email = 2;
     string password = 3;
+    ResponseMeta meta = 5;
+
 }

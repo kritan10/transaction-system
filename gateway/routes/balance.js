@@ -2,6 +2,7 @@ import express from 'express';
 import { balanceClient } from '../client/index.js';
 import { StatusCodes } from 'http-status-codes';
 import { authMiddleware } from '../middleware/auth.js';
+import customResponseHandler from '../utils/response-handler.js';
 
 const router = express.Router();
 
@@ -11,7 +12,7 @@ router.get('/transfer/initiate', (req, res, next) => {
 	const { senderAccount, receiverAccount, amount } = req.body;
 
 	if (!(senderAccount && receiverAccount && amount)) {
-		res.status(StatusCodes.BAD_REQUEST).send({ message: 'Invalid request' });
+		return res.status(StatusCodes.BAD_REQUEST).send({ message: 'Invalid request' });
 	}
 
 	const params = {
@@ -21,11 +22,7 @@ router.get('/transfer/initiate', (req, res, next) => {
 	};
 
 	balanceClient.InitiateTransaction(params, (err, response) => {
-		console.log(err);
-		if (err) {
-			return res.status(StatusCodes.BAD_REQUEST).send({ message: err.message });
-		}
-		res.status(StatusCodes.OK).send(response);
+		customResponseHandler(err, res, response);
 	});
 });
 
@@ -33,7 +30,7 @@ router.get('/transfer/verify', (req, res, next) => {
 	const { transactionId, otp } = req.body;
 
 	if (!(transactionId && otp)) {
-		res.status(StatusCodes.BAD_REQUEST).send({ message: 'Invalid request' });
+		return res.status(StatusCodes.BAD_REQUEST).send({ message: 'Invalid request' });
 	}
 
 	const params = {
@@ -42,19 +39,14 @@ router.get('/transfer/verify', (req, res, next) => {
 	};
 
 	balanceClient.CompleteTransaction(params, (err, response) => {
-		console.log(err);
-		if (err) {
-			console.log(err.details);
-			return res.status(StatusCodes.BAD_REQUEST).send({ message: err.message });
-		}
-		res.status(StatusCodes.OK).send(response);
+		customResponseHandler(err, res, response);
 	});
 });
 
 router.get('/load', (req, res, next) => {
 	const { accountNumber, amount } = req.body;
 	if (!(accountNumber && amount)) {
-		res.status(StatusCodes.BAD_REQUEST).send({ message: 'Invalid request' });
+		return res.status(StatusCodes.BAD_REQUEST).send({ message: 'Invalid request' });
 	}
 
 	const params = {
@@ -63,8 +55,7 @@ router.get('/load', (req, res, next) => {
 	};
 
 	balanceClient.LoadBalance(params, (err, response) => {
-		if (err) return next(err);
-		res.status(StatusCodes.OK).send(response);
+		customResponseHandler(err, res, response);
 	});
 });
 

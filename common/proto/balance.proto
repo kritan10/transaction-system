@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "common.proto";
+
 package balance;
 
 service BalanceService {
@@ -18,6 +20,7 @@ message InitiateTransactionRequest {
 
 message InitiateTransactionResponse {
     string transaction_id = 1;
+    ResponseMeta meta = 6;
 }
 
 
@@ -31,6 +34,7 @@ message CreateBalanceAccountResponse{
     int32 account_number = 1;
     double amount = 2;
     string account_type = 3;
+    ResponseMeta meta = 6;
 }
 
 
@@ -42,8 +46,7 @@ message LoadBalanceRequest{
 message LoadBalanceResponse{
     int32 account_number = 1;
     double balance = 2;
-    bool success = 3;
-    string message = 4;
+    ResponseMeta meta = 6;
 }
 
 
@@ -53,8 +56,11 @@ message CompleteTransactionRequest{
 }
 
 message CompleteTransactionResponse{
-    bool success = 1;
-    string message = 2;
+    int32 from = 1;
+    int32 to = 2;
+    double amount = 3;
+    string transaction_date = 4;
+    ResponseMeta meta = 6;
 }
 
 
@@ -73,4 +79,5 @@ message GetTransactionHistoryRequest{
 
 message GetTransactionHistoryResponse{
     repeated Transaction transactions = 1;
+    ResponseMeta meta = 6;
 }
