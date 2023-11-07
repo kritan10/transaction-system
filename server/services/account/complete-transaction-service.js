@@ -1,7 +1,12 @@
+import dotenv from 'dotenv';
+import process from 'process';
 import connection from '../../db/connection.js';
 import { getBalanceByAccountNumber, updateBalance } from '../../db/dao/account/index.js';
 import { getTransactionDetailsById, updateTransactionRetries, updateTransactionStatus } from '../../db/dao/transaction/index.js';
 import { TransactionErrorCodes, TransactionError, customErrorHandler, RequestError } from '../../errors/index.js';
+import { sendTransactionCompleteMail } from '../emailer.js';
+
+dotenv.config({ path: `./.env.${process.env.NODE_ENV}` });
 
 async function completeTransactionService(call, callback) {
 	const { transaction_id, otp } = call.request;
@@ -16,7 +21,7 @@ async function completeTransactionService(call, callback) {
 		await increaseReceiverBalance(transaction.receiver, transaction.amount);
 		await updateTransactionStatus(transaction_id, 'success');
 		await connection.commit();
-		// await sendTransactionCompleteMail();
+		if (process.env.ENABLE_NODEMAILER) await sendTransactionCompleteMail();
 
 		return callback(null, {
 			from: transaction.sender,

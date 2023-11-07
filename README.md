@@ -21,4 +21,5 @@ The API allows users to create accounts and exchange balance between each other.
 -   [x] add endpoints for balance transaction in gateway
 -   [x] add feature to fail transaction if wrong otp is provided for 3 time
 -   [x] add feature to get transaction history for user
+-   [x] add feature to email otp and transaction notification
 -   [ ] add queuing feature

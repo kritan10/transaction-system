@@ -1,7 +1,12 @@
 import { v4 } from 'uuid';
+import dotenv from 'dotenv';
+import process from 'process';
 import { createTransaction } from '../../db/dao/transaction/index.js';
 import { RequestError, TransactionError, TransactionErrorCodes, customErrorHandler } from '../../errors/index.js';
 import { getAccountByAccountNumber, getBalanceByAccountNumber } from '../../db/dao/account/index.js';
+import { sendOTPMail } from '../emailer.js';
+
+dotenv.config({ path: `./.env.${process.env.NODE_ENV}` });
 
 async function initiateTransactionService(call, callback) {
 	const { sender_acc: senderAccount, receiver_acc: receiverAccount, amount: transactionAmount } = call.request;
@@ -13,6 +18,7 @@ async function initiateTransactionService(call, callback) {
 		await validateReceiverAccount(receiverAccount);
 		await validateAmount(senderAccount, transactionAmount);
 		await createTransaction(transactionId, senderAccount, receiverAccount, transactionAmount, 'pending', otp, 'transfer');
+		if (process.env.ENABLE_NODEMAILER) await sendOTPMail(otp);
 		return callback(null, {
 			transaction_id: transactionId,
 			meta: {
