@@ -18,7 +18,7 @@ async function initiateTransactionService(call, callback) {
 		await validateReceiverAccount(receiverAccount);
 		await validateAmount(senderAccount, transactionAmount);
 		await createTransaction(transactionId, senderAccount, receiverAccount, transactionAmount, 'pending', otp, 'transfer');
-		if (process.env.ENABLE_NODEMAILER) await sendOTPMail(otp);
+		if (process.env.ENABLE_NODEMAILER != 0) await sendOTPMail(otp);
 		return callback(null, {
 			transaction_id: transactionId,
 			meta: {

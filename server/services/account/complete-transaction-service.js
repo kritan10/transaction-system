@@ -21,7 +21,7 @@ async function completeTransactionService(call, callback) {
 		await increaseReceiverBalance(transaction.receiver, transaction.amount);
 		await updateTransactionStatus(transaction_id, 'success');
 		await connection.commit();
-		if (process.env.ENABLE_NODEMAILER) await sendTransactionCompleteMail();
+		if (process.env.ENABLE_NODEMAILER != 0) await sendTransactionCompleteMail();
 
 		return callback(null, {
 			from: transaction.sender,

@@ -9,8 +9,8 @@ service UserService {
     rpc GetUserByAccountNumber(GetUserByAccNumRequest) returns (User);
     rpc GetUserCredentialsByEmail (GetUserDataByEmailRequest) returns (UserData);
     rpc CreateUser(CreateUserRequest) returns (User);
-    rpc UpdateUser(UpdateUserRequest) returns (MessageResponse);
-    rpc DeleteUser(DeleteUserRequest) returns (MessageResponse);
+    rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
+    rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse);
 }
 
 message Empty {};
@@ -44,13 +44,19 @@ message UpdateUserRequest {
     string name = 2;
 }
 
+message UpdateUserResponse{
+    string name = 1;
+    string email = 2;
+    ResponseMeta meta = 3;
+
+}
+
 message DeleteUserRequest {
     string user_id = 1;
 }
 
-message MessageResponse {
-    string message = 1;
-    ResponseMeta meta = 5;
+message DeleteUserResponse {
+    ResponseMeta meta = 1;
 }
 
 message GetUserDataByEmailRequest{

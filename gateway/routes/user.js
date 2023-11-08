@@ -19,4 +19,15 @@ router.get('/profile', (req, res, next) => {
 	});
 });
 
+router.put('/edit', (req, res, next) => {
+	const token = req.headers.authorization.split(' ')[1];
+	const decoded = jwt.verify(token, process.env.JWT_KEY);
+
+	const newName = req.body.name;
+	// console.log(decoded);
+	userClient.UpdateUser({ user_id: decoded.user_id, name: newName }, (err, response) => {
+		customResponseHandler(err, res, response);
+	});
+});
+
 export { router as userRouter };

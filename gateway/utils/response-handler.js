@@ -10,7 +10,7 @@ function customResponseHandler(err, res, gRes) {
 	}
 	if (gRes?.meta?.status === 'FAILED') {
 		console.log(gRes);
-		return res.status(StatusCodes.BAD_REQUEST).send(gRes.meta);
+		return res.status(StatusCodes.BAD_REQUEST).send({ meta: gRes.meta });
 	}
 	res.status(StatusCodes.OK).send(gRes);
 }
