@@ -1,12 +1,11 @@
 import grpc from '@grpc/grpc-js';
-
+import { connect } from 'amqplib';
 import { BalanceService, UserService } from './proto/index.js';
 import { createUser, deleteUser, updateUser, getUserById, getUserByAccountNumber, getUserCredentialsByEmail } from './services/user/index.js';
 import { createBalanceAccount, completeTransaction, initiateTransaction, loadBalance, getTransactionHistory } from './services/account/index.js';
-import customErrorHandler from './errors/error-handler.js';
 
-function main() {
-	var server = new grpc.Server();
+function startServer(port) {
+	let server = new grpc.Server();
 
 	server.addService(UserService, {
 		GetUserById: getUserById,
@@ -25,10 +24,50 @@ function main() {
 		GetTransactionHistoryByUser: getTransactionHistory,
 	});
 
-	server.bindAsync('0.0.0.0:3000', grpc.ServerCredentials.createInsecure(), (err, port) => {
+	server.bindAsync(`0.0.0.0:${port}`, grpc.ServerCredentials.createInsecure(), (err, port) => {
+		setupBroker(port);
 		console.log(`Server started at port ${port}`);
 		server.start();
 	});
 }
 
-main();
+async function setupBroker(serverPort) {
+	const queue = 'rpc_queue';
+
+	const connection = await connect('amqp://localhost');
+	const channel = await connection.createChannel();
+
+	await channel.assertQueue(queue, { durable: false });
+	channel.prefetch(1);
+	console.log(`[x] Awaiting RPC requests at port ${serverPort}`);
+
+	channel.consume(queue, (msg) => {
+		const message = msg.content.toString();
+		console.log(message, serverPort);
+		let result = null;
+		// switch (method) {
+		// 	case 1:
+		// 		result = addNum(args[0], args[1]);
+		// 		break;
+
+		// 	case 2:
+		// 		result = subtractNum(args[0], args[1]);
+		// 		break;
+
+		// 	default:
+		// 		break;
+		// }
+		// console.log(`method:${method}, args:${args}`);
+
+		const { replyTo, correlationId } = msg.properties;
+		console.log(replyTo, correlationId);
+		channel.sendToQueue(replyTo, Buffer.from('response'), {
+			correlationId: correlationId,
+		});
+		channel.ack(msg);
+	});
+}
+
+startServer(3000);
+startServer(3001);
+startServer(3002);

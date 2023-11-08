@@ -3,6 +3,7 @@ import { balanceClient } from '../client/index.js';
 import { StatusCodes } from 'http-status-codes';
 import { authMiddleware } from '../middleware/auth.js';
 import customResponseHandler from '../utils/response-handler.js';
+import { requestBroker } from '../middleware/broker.js';
 
 const router = express.Router();
 
@@ -21,9 +22,10 @@ router.get('/transfer/initiate', (req, res, next) => {
 		amount: amount,
 	};
 
-	balanceClient.InitiateTransaction(params, (err, response) => {
-		customResponseHandler(err, res, response);
-	});
+	requestBroker({ method: 'initiate_transaction', args: params });
+	// balanceClient.InitiateTransaction(params, (err, response) => {
+	// 	customResponseHandler(err, res, response);
+	// });
 });
 
 router.get('/transfer/verify', (req, res, next) => {
