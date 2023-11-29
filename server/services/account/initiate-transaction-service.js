@@ -5,6 +5,8 @@ import { createTransaction } from '../../db/dao/transaction/index.js';
 import { RequestError, TransactionError, TransactionErrorCodes, customErrorHandler } from '../../errors/index.js';
 import { getAccountByAccountNumber, getBalanceByAccountNumber } from '../../db/dao/account/index.js';
 import { sendOTPMail } from '../emailer.js';
+import { initSocket, sendQRMessage } from '../qr.js';
+import { getUserByAccountNumber } from '../../db/dao/user/index.js';
 
 dotenv.config({ path: `./.env.${process.env.NODE_ENV}` });
 
@@ -15,10 +17,22 @@ async function initiateTransactionService(call, callback) {
 		if (!senderAccount || !receiverAccount || !transactionAmount) throw new RequestError(RequestError.MISSING_PARAMS);
 		const transactionId = v4();
 		const otp = generateOTP();
+		console.log(otp);
 		await validateReceiverAccount(receiverAccount);
 		await validateAmount(senderAccount, transactionAmount);
 		await createTransaction(transactionId, senderAccount, receiverAccount, transactionAmount, 'pending', otp, 'transfer');
-		if (process.env.ENABLE_NODEMAILER != 0) await sendOTPMail(otp);
+		const mUser = await getUserByAccountNumber(receiverAccount);
+		const { account_number, name } = mUser;
+		try {
+			await initSocket(transactionId);
+			sendQRMessage(otp, { receiver_acc: account_number, receiver_name: name, amount: transactionAmount });
+		} catch (error) {
+			console.error(error);
+		}
+		// if (isConnectedToWebsocket) {
+		// } else {
+		// 	if (process.env.ENABLE_NODEMAILER != 0) await sendOTPMail(otp);
+		// }
 		return callback(null, {
 			transaction_id: transactionId,
 			meta: {

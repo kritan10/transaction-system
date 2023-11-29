@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>QR Scan</title>
+	</head>
+	<body>
+		<button id="button">Connect to Websocket</button>
+
+		<div style="display: flex">
+			<input type="text" id="otp" />
+			<button id="submit">Sumbit</button>
+		</div>
+
+		<img id="qr-image" src="/" />
+		<h2 id="user-data"></h2>
+		<div id="response"></div>
+
+		<script type="module">
+			import { io } from 'https://cdn.socket.io/4.7.2/socket.io.esm.min.js';
+
+			const button = document.getElementById('button');
+			const response = document.getElementById('response');
+			const submit = document.getElementById('submit');
+			const input = document.getElementById('otp');
+			const qr_image = document.getElementById('qr-image');
+			const user_data = document.getElementById('user-data');
+
+			const socket = io('localhost:3001', { ackTimeout: 30000, retries: 3, autoConnect: false });
+
+			socket.on('qr-initiate', (qr, receiver) => {
+				console.log(qr);
+				console.log(receiver);
+				qr_image.src = qr;
+				user_data.innerHTML = `Scan QR to confirm transaction<br/>
+				Sending To:<br/>
+				Name: ${receiver.receiver_name}  <br/>
+				Account_Number:${receiver.receiver_acc} <br/>
+				Amount:${receiver.amount} <br/>
+				`;
+			});
+
+			socket.on('transaction-status', (res) => {
+				console.log(res);
+				response.innerHTML = `${res.meta.message}`;
+			});
+
+			button.onclick = () => {
+				socket.connect();
+				// socket.emit(1);
+				button.disabled = true;
+				button.innerHTML = 'Connected';
+			};
+
+			submit.onclick = () => {
+				if (socket.disconnected) response.innerHTML = 'Socket not connected';
+				socket.emit('qr-response', input.value);
+			};
+		</script>
+	</body>
+</html>
