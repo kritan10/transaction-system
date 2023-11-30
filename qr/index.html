@@ -6,6 +6,7 @@
 		<title>QR Scan</title>
 	</head>
 	<body>
+		<input id="user" type="text" />
 		<button id="button">Connect to Websocket</button>
 
 		<div style="display: flex">
@@ -20,6 +21,7 @@
 		<script type="module">
 			import { io } from 'https://cdn.socket.io/4.7.2/socket.io.esm.min.js';
 
+			const user = document.getElementById('user');
 			const button = document.getElementById('button');
 			const response = document.getElementById('response');
 			const submit = document.getElementById('submit');
@@ -29,7 +31,7 @@
 
 			const socket = io('localhost:3001', { ackTimeout: 30000, retries: 3, autoConnect: false });
 
-			socket.on('qr-initiate', (qr, receiver) => {
+			socket.on('qr-initiate', (qr, transactionId, receiver) => {
 				console.log(qr);
 				console.log(receiver);
 				qr_image.src = qr;
@@ -39,6 +41,16 @@
 				Account_Number:${receiver.receiver_acc} <br/>
 				Amount:${receiver.amount} <br/>
 				`;
+
+				submit.onclick = () => {
+					if (socket.disconnected) {
+						response.innerHTML = 'Socket not connected';
+					} else {
+						socket.emit('qr-response', transactionId, input.value);
+					}
+					submit.removeEventListener('click');
+				};
+				response.innerHTML = 'Waiting for input...';
 			});
 
 			socket.on('transaction-status', (res) => {
@@ -48,14 +60,9 @@
 
 			button.onclick = () => {
 				socket.connect();
-				// socket.emit(1);
+				socket.emit('init', user.value);
 				button.disabled = true;
 				button.innerHTML = 'Connected';
-			};
-
-			submit.onclick = () => {
-				if (socket.disconnected) response.innerHTML = 'Socket not connected';
-				socket.emit('qr-response', input.value);
 			};
 		</script>
 	</body>

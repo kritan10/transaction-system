@@ -24,15 +24,13 @@ async function initiateTransactionService(call, callback) {
 		const mUser = await getUserByAccountNumber(receiverAccount);
 		const { account_number, name } = mUser;
 		try {
-			await initSocket(transactionId);
-			sendQRMessage(otp, { receiver_acc: account_number, receiver_name: name, amount: transactionAmount });
+			await initSocket();
+			sendQRMessage(otp, transactionId, { receiver_acc: account_number, receiver_name: name, amount: transactionAmount });
 		} catch (error) {
 			console.error(error);
+			if (process.env.ENABLE_NODEMAILER != 0) await sendOTPMail(otp);
 		}
-		// if (isConnectedToWebsocket) {
-		// } else {
-		// 	if (process.env.ENABLE_NODEMAILER != 0) await sendOTPMail(otp);
-		// }
+
 		return callback(null, {
 			transaction_id: transactionId,
 			meta: {
