@@ -8,7 +8,7 @@ module.exports = {
 			[
 				{
 					account_holder: '038f2f29-4de1-4b88-b114-635905a26c4f',
-					balance: 10000,
+					balance: 100000,
 					account_type: 'savings',
 				},
 				{
@@ -23,12 +23,12 @@ module.exports = {
 				},
 				{
 					account_holder: '9ddd9cda-f064-4b21-8324-e9816a0af47d',
-					balance: 10000,
+					balance: 100000,
 					account_type: 'savings',
 				},
 				{
 					account_holder: 'f61af6c5-570d-4e6a-a54a-6ce476f34e83',
-					balance: 10000,
+					balance: 100000,
 					account_type: 'savings',
 				},
 			],
