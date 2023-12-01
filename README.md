@@ -1,25 +1,150 @@
-# Bank Transaction System
+# gRPC Transaction System
 
-Bank transaction system built using node, gRPC and express.
-The API allows users to create accounts and exchange balance between each other.
+This is a Node.js based transaction system API built following the microservices architecture.
 
-## Features
+## Modules
 
--   transaction system to send and recieve balance between users
+The project consists of the following modules:
+
+### `server`
+
+The `server` module consists of the core logic to handle transactions.
+
+#### Dependencies
+
+-   **node-grpc**: gRPC Server
+-   **MySQL**: Database
+-   **Sequelize**: ORM
+-   **nodemailer**: Mail Client
+-   **bcrypt**: Password Hashing
+-   **socket.io-client**: Socket.IO client
+
+#### Running the server
+
+In order to run the server, a MySQL database is required. Download and install MySQL if your system does not have it already installed. Make sure the MySQL server is running.
+
+A configuration file is required in order for the server to work. Create a file name .env.development in the `server` folder with the following fields:
+
+```
+DB_HOST="127.0.0.1"
+DB_USER="root"
+DB_PASSWORD="password"
+DB_NAME="transaction_db"
+DB_PORT="3306"
+
+GRPC_ADDRESS="0.0.0.0"
+GRPC_PORT="50051"
+
+SOCKETIO_ADDRESS="0.0.0.0"
+SOCKETIO_PORT="3001"
+
+ENABLE_NODEMAILER=0
+NODEMAILER_EMAIL="myemail@mail.com"
+NODEMAILER_PASSWORD="mypassword"
+```
+
+Install all dependencies
+
+```sh
+npm install
+```
+
+When running for the first time
+
+```sh
+npm run init
+```
+
+After initialization, the server can be run with
+
+```sh
+npm start
+```
+
+---
+
+### `gateway`
+
+The `gateway` module consists of a standard REST API to communicate with the `server` using gRPC client.
+
+#### Dependencies
+
+-   **express**: HTTP Server
+-   **jsonwebtoken**: Handle JWT
+-   **bcrypt**: Password Hashing
+
+#### Running the gateway
+
+A configuration file is required in order for the gateway to work. Create a file name .env.development in the `gateway` folder with the following fields:
+
+```
+GRPC_ADDRESS="0.0.0.0"
+GRPC_PORT="3000"
+
+JWT_KEY="MY JWT KEY"
+JWT_EXPIRY_TIME="n d"
+```
+
+Note: _The gateway is incomplete and all functionality might not work. Consider using BloomRPC to use the server. The .proto files can be found in the `common` folder._
+
+Install all dependencies
+
+```sh
+npm install
+```
+
+Start the gateway
+
+```sh
+npm start
+```
+
+---
+
+### `common`
+
+The `common` module consists of files shared between two or more modules.
+
+#### Dependencies
+
+-   No dependencies.
+
+---
+
+### `qr`
+
+The `qr` module handles QR encoding/decoding and communication between `server` and a demo **browser client**.
+
+#### Dependencies
+
+-   **express**: HTTP Server
+-   **socket.io**: Socket.IO (Websocket)
+-   **styled-qr-code-node**: QR Code generation
+
+#### Running the `qr` server
+
+The QR server has a web portal available at the root address.
+
+Install all dependencies
+
+```sh
+npm install
+```
+
+Start the QR server
+
+```sh
+npm start
+```
+
+<br>
+
+## System Features
+
+-   standard transaction features
+-   send and receive balance
+-   get transaction history
+-   user account creation and management
 -   authentication using JWT
--   password hashing and encryption using bcrypt
--   data storage using mysql and sequelize
--   database seeders and migrations
--   secrets stored using dotenv
-
-## TODO
-
--   [x] separate user and account tables
--   [x] migrate from mysql2 to mysql2/promise
--   [x] add otp feature for transaction
--   [x] add feature to load balance
--   [x] add endpoints for balance transaction in gateway
--   [x] add feature to fail transaction if wrong otp is provided for 3 time
--   [x] add feature to get transaction history for user
--   [x] add feature to email otp and transaction notification
--   [ ] add queuing feature
+-   transaction verification through OTP or QR
+-   password hashing and encryption
