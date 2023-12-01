@@ -6,20 +6,31 @@
 		<title>QR Scan</title>
 	</head>
 	<body>
-		<input id="user" type="text" />
-		<button id="button">Connect to Websocket</button>
+		<div style="display: flex">
+			<input id="user" type="text" placeholder="username" />
+			<button id="button">Connect to Websocket</button>
+		</div>
+
+		<div style="height: 40px"></div>
 
 		<div style="display: flex">
-			<input type="text" id="otp" />
+			<input type="text" id="otp" placeholder="qr decoded message" />
 			<button id="submit">Sumbit</button>
 		</div>
 
-		<img id="qr-image" src="/" />
-		<h2 id="user-data"></h2>
+		<div>
+			<img id="qr-image" src="/" />
+			<h4 id="user-data"></h4>
+		</div>
+
 		<div id="response"></div>
 
 		<script type="module">
 			import { io } from 'https://cdn.socket.io/4.7.2/socket.io.esm.min.js';
+
+			const QR_INITIATE = 1;
+			const QR_RESPONSE = 2;
+			const TRANSACTION = 3;
 
 			const user = document.getElementById('user');
 			const button = document.getElementById('button');
@@ -31,7 +42,7 @@
 
 			const socket = io('localhost:3001', { ackTimeout: 30000, retries: 3, autoConnect: false });
 
-			socket.on('qr-initiate', (qr, transactionId, receiver) => {
+			socket.on(QR_INITIATE, (qr, transactionId, receiver) => {
 				console.log(qr);
 				console.log(receiver);
 				qr_image.src = qr;
@@ -46,14 +57,14 @@
 					if (socket.disconnected) {
 						response.innerHTML = 'Socket not connected';
 					} else {
-						socket.emit('qr-response', transactionId, input.value);
+						socket.emit(QR_RESPONSE, transactionId, input.value);
 					}
 					submit.removeEventListener('click');
 				};
 				response.innerHTML = 'Waiting for input...';
 			});
 
-			socket.on('transaction-status', (res) => {
+			socket.on(TRANSACTION, (res) => {
 				console.log(res);
 				response.innerHTML = `${res.meta.message}`;
 			});
@@ -62,7 +73,7 @@
 				socket.connect();
 				socket.emit('init', user.value);
 				button.disabled = true;
-				button.innerHTML = 'Connected';
+				button.innerHTML = `Connected as ${user.value}`;
 			};
 		</script>
 	</body>

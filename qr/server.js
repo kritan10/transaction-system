@@ -4,6 +4,7 @@ import express from 'express';
 import { Server } from 'socket.io';
 import cors from 'cors';
 import { generateFancyQR } from './qr.js';
+import { SocketEvents } from '../common/socket-events.js';
 
 const app = express();
 const server = createServer(app);
@@ -16,7 +17,7 @@ app.get('/', (req, res) => {
 	res.sendFile(path.resolve('index.html'));
 });
 
-var clients = [];
+let clients = [];
 
 io.on('connection', async (socket) => {
 	console.log(io.engine.clientsCount);
@@ -26,21 +27,21 @@ io.on('connection', async (socket) => {
 		ackcb();
 	});
 
-	socket.on('qr-initiate', async (otp, transactionId, receiver, ackcb) => {
-		const qr = await generateFancyQR(otp);
-		const emitTo = clients.filter((c) => c?.user === 'kritan');
-		emitTo.forEach((c) => io.to(c?.socket).emit('qr-initiate', qr, transactionId, receiver));
-		// socket.broadcast.emit();
+	socket.on(SocketEvents.QR_INITIATE, async (otp, transactionId, receiver, ackcb) => {
+		const base64PngQR = await generateFancyQR(otp);
+		const emitToUser = 'kritan';
+		const emitTo = clients.filter((c) => c?.user === emitToUser);
+		emitTo.forEach((c) => io.to(c?.socket).emit(SocketEvents.QR_INITIATE, base64PngQR, transactionId, receiver));
 		ackcb();
 	});
 
-	socket.on('qr-response', (userotp, transactionId, ackcb) => {
-		socket.broadcast.emit('qr-response', userotp, transactionId);
+	socket.on(SocketEvents.QR_RESPONSE, (userotp, transactionId, ackcb) => {
+		socket.broadcast.emit(SocketEvents.QR_RESPONSE, userotp, transactionId);
 		ackcb();
 	});
 
-	socket.on('transaction-status', (res, ackcb) => {
-		socket.broadcast.emit('transaction-status', res);
+	socket.on(SocketEvents.TRANSACTION, (res, ackcb) => {
+		socket.broadcast.emit(SocketEvents.TRANSACTION, res);
 		ackcb();
 	});
 
