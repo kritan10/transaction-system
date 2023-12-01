@@ -1,6 +1,24 @@
-# gRPC Transaction System
+# Transaction System - Node.js/gRPC
 
 This is a Node.js based transaction system API built following the microservices architecture.
+
+# Table of Contents
+
+- [Transaction System - Node.js/gRPC](#transaction-system---nodejsgrpc)
+- [Table of Contents](#table-of-contents)
+  - [Modules](#modules)
+    - [`server`](#server)
+      - [Dependencies](#dependencies)
+      - [Running the server](#running-the-server)
+    - [`gateway`](#gateway)
+      - [Dependencies](#dependencies-1)
+      - [Running the gateway](#running-the-gateway)
+    - [`common`](#common)
+      - [Dependencies](#dependencies-2)
+    - [`qr`](#qr)
+      - [Dependencies](#dependencies-3)
+      - [Running the `qr` server](#running-the-qr-server)
+  - [System Features](#system-features)
 
 ## Modules
 
@@ -46,7 +64,7 @@ NODEMAILER_PASSWORD="mypassword"
 Install all dependencies
 
 ```sh
-npm install
+cd server && npm install
 ```
 
 When running for the first time
@@ -90,7 +108,7 @@ Note: _The gateway is incomplete and all functionality might not work. Consider 
 Install all dependencies
 
 ```sh
-npm install
+cd gateway && npm install
 ```
 
 Start the gateway
@@ -128,7 +146,7 @@ The QR server has a web portal available at the root address.
 Install all dependencies
 
 ```sh
-npm install
+cd qr && npm install
 ```
 
 Start the QR server
