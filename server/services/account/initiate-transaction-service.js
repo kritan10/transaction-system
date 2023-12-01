@@ -1,12 +1,12 @@
+import process from 'node:process';
 import { v4 } from 'uuid';
 import dotenv from 'dotenv';
-import process from 'process';
+
 import { createTransaction } from '../../db/dao/transaction/index.js';
 import { RequestError, TransactionError, TransactionErrorCodes, customErrorHandler } from '../../errors/index.js';
 import { getAccountByAccountNumber, getBalanceByAccountNumber } from '../../db/dao/account/index.js';
-import { sendOTPMail } from '../emailer.js';
-import { initSocket, sendQRMessage } from '../qr.js';
 import { getUserByAccountNumber } from '../../db/dao/user/index.js';
+import { dispatchOTP } from '../otp_dispatcher.js';
 
 dotenv.config({ path: `./.env.${process.env.NODE_ENV}` });
 
@@ -21,15 +21,8 @@ async function initiateTransactionService(call, callback) {
 		await validateReceiverAccount(receiverAccount);
 		await validateAmount(senderAccount, transactionAmount);
 		await createTransaction(transactionId, senderAccount, receiverAccount, transactionAmount, 'pending', otp, 'transfer');
-		const mUser = await getUserByAccountNumber(receiverAccount);
-		const { account_number, name } = mUser;
-		try {
-			await initSocket();
-			sendQRMessage(otp, transactionId, { receiver_acc: account_number, receiver_name: name, amount: transactionAmount });
-		} catch (error) {
-			console.error(error);
-			if (process.env.ENABLE_NODEMAILER != 0) await sendOTPMail(otp);
-		}
+		const receiverDetails = await getUserByAccountNumber(receiverAccount);
+		dispatchOTP(transactionId, otp, receiverDetails);
 
 		return callback(null, {
 			transaction_id: transactionId,

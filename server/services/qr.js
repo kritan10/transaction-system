@@ -32,7 +32,7 @@ function initSocket() {
 		socket.emit('ping');
 
 		setTimeout(() => {
-			return reject('NOT_OK');
+			return reject('COULD_NOT_CONNECT_TO_WEBSOCKET');
 		}, 1000);
 	});
 }

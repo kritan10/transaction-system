@@ -13,14 +13,19 @@ async function completeTransactionService(call, callback) {
 	let transaction;
 	try {
 		if (!transaction_id || !otp) throw new RequestError(RequestError.MISSING_PARAMS);
-		await connection.beginTransaction();
 		transaction = await getTransactionDetailsById(transaction_id);
 		await verifyTransactionStatus(transaction);
 		await verifyTransactionOTP(otp, transaction.otp, transaction.id, transaction.otp_retries);
-		await decreaseSenderBalance(transaction.sender, transaction.amount);
-		await increaseReceiverBalance(transaction.receiver, transaction.amount);
-		await updateTransactionStatus(transaction_id, 'success');
-		await connection.commit();
+		try {
+			await connection.beginTransaction();
+			await decreaseSenderBalance(transaction.sender, transaction.amount);
+			await increaseReceiverBalance(transaction.receiver, transaction.amount);
+			await updateTransactionStatus(transaction_id, 'success');
+			await connection.commit();
+		} catch (error) {
+			await connection.rollback();
+			console.log();
+		}
 		if (process.env.ENABLE_NODEMAILER != 0) await sendTransactionCompleteMail();
 
 		return callback(null, {
@@ -35,7 +40,7 @@ async function completeTransactionService(call, callback) {
 			},
 		});
 	} catch (error) {
-		await connection.rollback();
+		// await connection.rollback();
 		if (error instanceof TransactionError && error.code === TransactionErrorCodes.INVALID_OTP) {
 			await increaseOtpRetries(transaction.id, transaction.otp_retries);
 		}
