@@ -6,7 +6,10 @@
 	"scripts": {
 		"test": "mocha",
 		"start": "NODE_ENV=development nodemon index",
-		"reset_db": "npx sequelize-cli db:migrate:undo:all && npx sequelize-cli db:migrate && npx sequelize-cli db:seed:all  "
+		"migrate": "npx sequelize-cli db:migrate",
+		"seed": "npm run migrate && npx sequelize-cli db:seed:all",
+		"init": "NODE_ENV=development node db/init.js && npm run seed && npm run start",
+		"reset_db": "npx sequelize-cli db:migrate:undo:all && npm run seed"
 	},
 	"type": "module",
 	"author": "kritan",
