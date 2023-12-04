@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="./index.css" />
+		<title>QR Scan</title>
+	</head>
+	<body>
+		<div class="flex-col">
+			<div class="flex-row">
+				<p>User ID (Account Number)</p>
+				<input id="input-userid" type="text" placeholder="e.g. 1000" />
+			</div>
+			<button id="btn-connect">Connect to Websocket</button>
+			<p id="div-connection-status"></p>
+		</div>
+
+		<div class="spacer"></div>
+
+		<div class="flex-row content">
+			<div class="flex-col">
+				<h3>Request Balance</h3>
+				<div class="flex-row">
+					<p>Amount</p>
+					<input id="input-amount" placeholder="Amount" />
+				</div>
+				<div class="flex-row">
+					<p>Remarks</p>
+					<input id="input-remarks" placeholder="Remarks" />
+				</div>
+				<button id="btn-request-balance">Request</button>
+			</div>
+
+			<div class="flex-col">
+				<h3>QR Decoder</h3>
+				<div class="flex-row">
+					<p>QR Message</p>
+					<input type="text" id="input-qr" placeholder="QR Message" />
+				</div>
+				<button id="btn-transfer-balance">Scan QR</button>
+
+				<div>
+					<p id="txn-sender"></p>
+					<p id="txn-receiver"></p>
+					<p id="txn-amount"></p>
+					<p id="txn-remarks"></p>
+					<button id="btn-accept-txn">Accept</button>
+					<button id="btn-decline-txn">Reject</button>
+				</div>
+
+				<p id="text-transaction-status"></p>
+			</div>
+		</div>
+
+		<div class="spacer"></div>
+
+		<div class="flex-col">
+			<img id="incoming-messages" />
+		</div>
+
+		<!-- <div id="response"></div> -->
+
+		<script type="module">
+			import { io } from 'https://cdn.socket.io/4.7.2/socket.io.esm.min.js';
+
+			let currentTransaction = null;
+
+			const USER_LOGIN = 1;
+			const REQUEST_BALANCE = 2;
+			const TRANSFER_BALANCE = 3;
+			const VERIFY_TRANSACTION = 4;
+
+			const inputUserId = document.getElementById('input-userid');
+			const inputAmount = document.getElementById('input-amount');
+			const inputRemarks = document.getElementById('input-remarks');
+			const inputQR = document.getElementById('input-qr');
+
+			const btnConnect = document.getElementById('btn-connect');
+			const btnRequest = document.getElementById('btn-request-balance');
+			const btnTransfer = document.getElementById('btn-transfer-balance');
+			const btnAcceptTxn = document.getElementById('btn-accept-txn');
+			const btnDeclineTxn = document.getElementById('btn-decline-txn');
+
+			const textTxnSender = document.getElementById('txn-sender');
+			const textTxnReceiver = document.getElementById('txn-receiver');
+			const textTxnAmount = document.getElementById('txn-remarks');
+			const textTxnRemarks = document.getElementById('txn-amount');
+			const textTxnStatus = document.getElementById('text-transaction-status');
+
+			const divConnectionStatus = document.getElementById('div-connection-status');
+			const divIncomingMessages = document.getElementById('incoming-messages');
+
+			const socket = io('localhost:3001', { ackTimeout: 30000, retries: 3, autoConnect: false });
+			// socket.connect();
+
+			socket.on(USER_LOGIN, (success, username) => {
+				if (success) divConnectionStatus.innerHTML = `Logged in as ${username}`;
+				divConnectionStatus.innerHTML = `Error logging in`;
+			});
+
+			socket.on(REQUEST_BALANCE, (message) => {
+				divIncomingMessages.src = message;
+				// divIncomingMessages.appendChild(incomingQR);
+			});
+
+			socket.on(TRANSFER_BALANCE, (transaction) => {
+				console.log(transaction);
+				currentTransaction = transaction.id;
+				const { sender, receiver, amount, remarks } = transaction;
+				textTxnSender.innerHTML = `sender: you (${sender})`;
+				textTxnReceiver.innerHTML = `receiver: ${receiver}`;
+				textTxnAmount.innerHTML = `amount: ${amount}`;
+				textTxnRemarks.innerHTML = `remarks: ${remarks}`;
+			});
+
+			socket.on(VERIFY_TRANSACTION, (message) => {
+				textTxnStatus.innerHTML = `Transaction status: ${message}`;
+			});
+
+			btnConnect.onclick = () => {
+				socket.connect();
+				const currentUser = inputUserId.value;
+				socket.emit(USER_LOGIN, currentUser);
+				btnConnect.disabled = true;
+				btnConnect.innerHTML = `Connected`;
+			};
+
+			btnRequest.onclick = () => {
+				if (socket.disconnected) socket.connect();
+				socket.emit(REQUEST_BALANCE, inputAmount.value, inputRemarks.value);
+				btnRequest.disabled = true;
+				btnTransfer.disabled = true;
+				btnRequest.innerHTML = `Requested`;
+				setTimeout(() => {
+					btnRequest.disabled = false;
+					btnTransfer.disabled = false;
+					btnRequest.innerHTML = `Request`;
+				}, 2500);
+			};
+
+			btnTransfer.onclick = () => {
+				if (socket.disconnected) socket.connect();
+				socket.emit(TRANSFER_BALANCE, inputQR.value);
+			};
+
+			btnAcceptTxn.onclick = () => {
+				socket.emit(VERIFY_TRANSACTION, true, currentTransaction);
+			};
+
+			btnDeclineTxn.onclick = () => {
+				socket.emit(VERIFY_TRANSACTION, false, currentTransaction);
+			};
+		</script>
+	</body>
+</html>

@@ -15,9 +15,9 @@ This is a Node.js based transaction system API built following the microservices
       - [Running the gateway](#running-the-gateway)
     - [`common`](#common)
       - [Dependencies](#dependencies-2)
-    - [`qr`](#qr)
+    - [`qr-socketio`](#qr-socketio)
       - [Dependencies](#dependencies-3)
-      - [Running the `qr` server](#running-the-qr-server)
+      - [Running the `qr-socketio` server](#running-the-qr-socketio-server)
   - [System Features](#system-features)
 
 ## Modules
@@ -129,9 +129,9 @@ The `common` module consists of files shared between two or more modules.
 
 ---
 
-### `qr`
+### `qr-socketio`
 
-The `qr` module handles QR encoding/decoding and communication between `server` and a demo **browser client**.
+The `qr-socketio` module handles QR encoding/decoding and communication between `server` and a demo **browser client**. User can create a transaction request which generates a QR code. This QR code can be scanned by other users to transfer balance from their account to the user who requested the balance.
 
 #### Dependencies
 
@@ -139,7 +139,7 @@ The `qr` module handles QR encoding/decoding and communication between `server` 
 -   **socket.io**: Socket.IO (Websocket)
 -   **styled-qr-code-node**: QR Code generation
 
-#### Running the `qr` server
+#### Running the `qr-socketio` server
 
 The QR server has a web portal available at the root address.
 
@@ -164,5 +164,6 @@ npm start
 -   get transaction history
 -   user account creation and management
 -   authentication using JWT
--   transaction verification through OTP or QR
+-   transaction verification through OTP
+-   transaction request and completion through QR code 
 -   password hashing and encryption

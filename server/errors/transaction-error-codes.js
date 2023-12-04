@@ -5,7 +5,7 @@ class TransactionErrorCodes {
 	static INSUFFICIENT_BALANCE = 1003;
 	static OTP_LIMIT_REACHED = 1004;
 	static INVALID_RECEIVER = 1005;
-
+	static UNHANDLED_TRANSACTION_EXCEPTION = 1006;
 }
 
 export default TransactionErrorCodes;

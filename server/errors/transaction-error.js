@@ -33,6 +33,10 @@ class TransactionError extends Error {
 				this.message = 'This receiver does not exist.';
 				break;
 
+			case TransactionErrorCodes.UNHANDLED_TRANSACTION_EXCEPTION:
+				this.message = 'Something went wrong. The transaction was reverted.';
+				break;
+
 			default:
 				this.message = 'message not implemented';
 				break;

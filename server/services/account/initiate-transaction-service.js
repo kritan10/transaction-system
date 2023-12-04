@@ -5,8 +5,6 @@ import dotenv from 'dotenv';
 import { createTransaction } from '../../db/dao/transaction/index.js';
 import { RequestError, TransactionError, TransactionErrorCodes, customErrorHandler } from '../../errors/index.js';
 import { getAccountByAccountNumber, getBalanceByAccountNumber } from '../../db/dao/account/index.js';
-import { getUserByAccountNumber } from '../../db/dao/user/index.js';
-import { dispatchOTP } from '../otp_dispatcher.js';
 
 dotenv.config({ path: `./.env.${process.env.NODE_ENV}` });
 
@@ -21,11 +19,11 @@ async function initiateTransactionService(call, callback) {
 		await validateReceiverAccount(receiverAccount);
 		await validateAmount(senderAccount, transactionAmount);
 		await createTransaction(transactionId, senderAccount, receiverAccount, transactionAmount, 'pending', otp, 'transfer');
-		const receiverDetails = await getUserByAccountNumber(receiverAccount);
-		dispatchOTP(transactionId, otp, receiverDetails);
+
 
 		return callback(null, {
 			transaction_id: transactionId,
+			otp: otp,
 			meta: {
 				code: 1,
 				status: 'OK',
