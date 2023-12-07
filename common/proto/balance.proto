@@ -10,39 +10,18 @@ service BalanceService {
     rpc LoadBalance (LoadBalanceRequest) returns (LoadBalanceResponse);
     rpc CreateBalanceAccount (CreateBalanceAccountRequest) returns (CreateBalanceAccountResponse);
     rpc GetTransactionHistoryByUser (GetTransactionHistoryRequest) returns (GetTransactionHistoryResponse);
-    // rpc RequestBalanceFromQR (RequestBalanceFromQRRequest) returns (RequestBalanceFromQRResponse);
-    // rpc CompleteQRTransactionService (CompleteQRTransactionRequest) returns (CompleteQRTransactionResponse);
 }
 
 message InitiateTransactionRequest {
     int32 sender_acc = 1;
     int32 receiver_acc = 2;
     float amount = 3;
+    string remarks = 4;
 }
 
 message InitiateTransactionResponse {
     string transaction_id = 1;
     string otp = 2;
-    ResponseMeta meta = 6;
-}
-
-message RequestBalanceFromQRRequest{
-    int32 to_account = 1;
-    float amount = 2;
-}
-
-message RequestBalanceFromQRResponse {
-    string base64_qr = 1;
-    ResponseMeta meta = 6;
-}
-
-message CompleteQRTransactionRequest{
-    int32 sender = 1;
-    string transactionId = 2; 
-}
-
-message CompleteQRTransactionResponse{
-    string transaction_id = 1;
     ResponseMeta meta = 6;
 }
 

@@ -9,7 +9,7 @@ import { getAccountByAccountNumber, getBalanceByAccountNumber } from '../../db/d
 dotenv.config({ path: `./.env.${process.env.NODE_ENV}` });
 
 async function initiateTransactionService(call, callback) {
-	const { sender_acc: senderAccount, receiver_acc: receiverAccount, amount: transactionAmount } = call.request;
+	const { sender_acc: senderAccount, receiver_acc: receiverAccount, amount: transactionAmount, remarks: remarks } = call.request;
 
 	try {
 		if (!senderAccount || !receiverAccount || !transactionAmount) throw new RequestError(RequestError.MISSING_PARAMS);
@@ -18,8 +18,7 @@ async function initiateTransactionService(call, callback) {
 		console.log(otp);
 		await validateReceiverAccount(receiverAccount);
 		await validateAmount(senderAccount, transactionAmount);
-		await createTransaction(transactionId, senderAccount, receiverAccount, transactionAmount, 'pending', otp, 'transfer');
-
+		await createTransaction(transactionId, senderAccount, receiverAccount, transactionAmount, 'pending', otp, 'transfer', remarks);
 
 		return callback(null, {
 			transaction_id: transactionId,
