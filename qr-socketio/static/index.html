@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="./static/index.css" />
+		<title>QR Scan</title>
+	</head>
+	<body>
+		<div class="flex-row content">
+			<!-- start of request balance section -->
+			<div class="flex-col">
+				<h3>Request Balance</h3>
+				<div class="flex-row">
+					<p>User ID (Account Number)</p>
+					<input id="input-requester-userid" type="text" placeholder="e.g. 1000" />
+				</div>
+				<div class="flex-row">
+					<p>Amount</p>
+					<input id="input-amount" placeholder="Amount" />
+				</div>
+				<div class="flex-row">
+					<p>Remarks</p>
+					<input id="input-remarks" placeholder="Remarks" />
+				</div>
+				<button id="btn-request-balance">Connect & Request</button>
+
+				<!-- append incoming message related to balance request here -->
+				<div id="div-request-balance">
+					<img id="img-request-qr" src="" />
+				</div>
+			</div>
+			<!-- end of request balance section -->
+
+			<!-- --- --- --- --- --- --- --- --- --- --- --- --- --- --- -->
+
+			<!-- start of decode/transfer balance section -->
+			<div class="flex-col">
+				<h3>QR Decoder</h3>
+				<div class="flex-row">
+					<p>User ID (Account Number)</p>
+					<input id="input-sender-userid" type="text" placeholder="e.g. 1000" />
+				</div>
+				<div class="flex-row">
+					<p>QR Message</p>
+					<input type="text" id="input-qr" placeholder="QR Message" />
+				</div>
+				<button id="btn-scan-qr">Scan QR</button>
+
+				<!-- append incoming message related to transfer balance here -->
+				<div id="div-transfer-balance">
+					<div id="toggle">
+						<h5>Incoming Transaction</h5>
+						<div id="div-transfer-balance-transaction-details">
+							<!-- keep transaction details here -->
+						</div>
+						<button id="btn-accept-txn">Accept</button>
+						<button id="btn-decline-txn">Reject</button>
+					</div>
+				</div>
+			</div>
+			<!-- end of decode/transfer balance section -->
+		</div>
+
+		<script type="module">
+			import { io } from 'https://cdn.socket.io/4.7.2/socket.io.esm.min.js';
+
+			function createChildNode(childType, content) {
+				const child = document.createElement(childType);
+				child.innerHTML = content;
+				return child;
+			}
+
+			let currentTransaction = null;
+
+			const INIT = 1;
+			const REQUEST_BALANCE = 2;
+			const DECODE_QR = 3;
+			const TRANSACTION_STATUS = 4;
+			const ACCEPT_TRANSACTION = 5;
+			const REJECT_TRANSACTION = 6;
+
+			const inputRequesterUserId = document.getElementById('input-requester-userid');
+			const inputSenderUserId = document.getElementById('input-sender-userid');
+			const inputAmount = document.getElementById('input-amount');
+			const inputRemarks = document.getElementById('input-remarks');
+			const inputQR = document.getElementById('input-qr');
+
+			const btnRequest = document.getElementById('btn-request-balance');
+			const btnScanQr = document.getElementById('btn-scan-qr');
+			const btnAcceptTxn = document.getElementById('btn-accept-txn');
+			const btnDeclineTxn = document.getElementById('btn-decline-txn');
+
+			const divRequestBalance = document.getElementById('div-request-balance');
+			const divTransferBalance = document.getElementById('div-transfer-balance');
+			const divTransactionDetails = document.getElementById('div-transfer-balance-transaction-details');
+
+			const imgRequestQr = document.getElementById('img-request-qr');
+
+			const socket = io('localhost:3001', { ackTimeout: 30000, retries: 3, autoConnect: false });
+
+			function initSocketConnection(userid) {
+				socket.connect();
+				const currentUser = userid;
+				socket.emit(INIT, currentUser);
+			}
+
+			socket.on(INIT, (socketid, userid) => {
+				let htmlMessage = `Error logging in...`;
+				if (socketid && userid) htmlMessage = `You are connected as ${userid}. Socket ID: ${socketid}`;
+				divRequestBalance.appendChild(createChildNode('p', htmlMessage));
+			});
+
+			socket.on(REQUEST_BALANCE, (qrData) => {
+				imgRequestQr.src = qrData;
+				console.log(qrData);
+			});
+
+			socket.on(DECODE_QR, (transaction, sender) => {
+				console.log(transaction);
+				currentTransaction = transaction;
+				const { receiver, amount, remarks } = transaction;
+				divTransactionDetails.appendChild(createChildNode('p', `Sender: You (${sender})`));
+				divTransactionDetails.appendChild(createChildNode('p', `Receiver: ${receiver}`));
+				divTransactionDetails.appendChild(createChildNode('p', `Amount: ${amount}`));
+				divTransactionDetails.appendChild(createChildNode('p', `Remarks: ${remarks}`));
+			});
+
+			socket.on(TRANSACTION_STATUS, (message) => {
+				divTransferBalance.appendChild(createChildNode('p', message));
+			});
+
+			btnRequest.onclick = () => {
+				if (socket.disconnected) initSocketConnection(inputRequesterUserId.value);
+				socket.emit(REQUEST_BALANCE, inputAmount.value, inputRemarks.value);
+				// btnRequest.disabled = true;
+				// btnTransfer.disabled = true;
+				btnRequest.innerHTML = `Requested`;
+				setTimeout(() => {
+					// 	btnRequest.disabled = false;
+					// 	btnTransfer.disabled = false;
+					btnRequest.innerHTML = `Request`;
+				}, 2500);
+			};
+
+			btnScanQr.onclick = () => {
+				if (socket.disconnected) initSocketConnection(inputSenderUserId.value);
+				socket.emit(DECODE_QR, inputQR.value);
+			};
+
+			btnAcceptTxn.onclick = () => {
+				if (!currentTransaction?.id) return;
+				socket.emit(ACCEPT_TRANSACTION, currentTransaction.id);
+				currentTransaction = null;
+			};
+
+			btnDeclineTxn.onclick = () => {
+				if (!currentTransaction?.id) return;
+				socket.emit(REJECT_TRANSACTION, currentTransaction.id);
+				currentTransaction = null;
+			};
+		</script>
+	</body>
+</html>

@@ -1,3 +1,5 @@
+import { Buffer } from 'node:buffer';
+
 import Jimp from 'jimp';
 import decodeQR from '@paulmillr/qr/decode.js';
 import { QRCodeCanvas } from '@loskir/styled-qr-code-node';
