@@ -1,6 +1,7 @@
+import path from 'node:path';
+
 import grpc from '@grpc/grpc-js';
 import protoloader from '@grpc/proto-loader';
-import path from 'path';
 
 const balancePackage = protoloader.loadSync(path.resolve('../common/proto/balance.proto'), {
 	keepCase: true,

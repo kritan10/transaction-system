@@ -1,7 +1,8 @@
+import process from 'node:process';
+
 import express from 'express';
-import { StatusCodes } from 'http-status-codes';
 import jwt from 'jsonwebtoken';
-import process from 'process';
+
 import { userClient } from '../client/index.js';
 import { authMiddleware } from '../middleware/auth.js';
 import customResponseHandler from '../utils/response-handler.js';

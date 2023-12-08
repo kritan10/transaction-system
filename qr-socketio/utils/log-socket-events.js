@@ -1,14 +1,25 @@
+/**
+ * This function is a simple utility logger to log incoming and outgoing websocket messages.
+ * @param {} socket The connected client instance
+ * @param {boolean} enabled Whether to enable the logger
+ * @returns void
+ */
 export function logIncomingAndOutgoingEvents(socket, enabled) {
 	if (!enabled) return;
 	socket.onAny((eventName) => {
-		console.log(`incoming event: ${parseEvent(eventName)}`); // 'hello'
+		console.log(`incoming event: ${parseEvent(eventName)}`);
 	});
 
 	socket.onAnyOutgoing((eventName) => {
-		console.log(`outgoing event: ${parseEvent(eventName)}`); // 'hello'
+		console.log(`outgoing event: ${parseEvent(eventName)}`);
 	});
 }
 
+/**
+ * This function parses event code to their corresponding names.
+ * @param {number} eventName the event code
+ * @returns event name
+ */
 function parseEvent(eventName) {
 	switch (eventName) {
 		case 1:
@@ -23,8 +34,11 @@ function parseEvent(eventName) {
 			return 'ACCEPT_TRANSACTION';
 		case 6:
 			return 'REJECT_TRANSACTION';
-
+		case 7:
+			return 'START_QR_TIMER';
+		case 8:
+			return 'DISSOLVE_QR';
 		default:
-			break;
+			return 'UNKNOWN_EVENT';
 	}
 }

@@ -1,6 +1,7 @@
 import express from 'express';
-import { balanceClient } from '../client/index.js';
 import { StatusCodes } from 'http-status-codes';
+
+import { balanceClient } from '../client/index.js';
 import { authMiddleware } from '../middleware/auth.js';
 import customResponseHandler from '../utils/response-handler.js';
 

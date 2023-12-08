@@ -1,8 +1,7 @@
 import path from 'node:path';
-// import process from 'node:process';
+
 import grpc from '@grpc/grpc-js';
 import protoloader from '@grpc/proto-loader';
-// dotenv.config({ path: `./.env.${process.env.NODE_ENV}` });
 
 const balancePackage = protoloader.loadSync(path.resolve('../common/proto/balance.proto'), {
 	keepCase: true,

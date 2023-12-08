@@ -1,8 +1,10 @@
+import process from 'node:process';
+
 import express from 'express';
-import process from 'process';
 import { StatusCodes } from 'http-status-codes';
 import jwt from 'jsonwebtoken';
 import { compare } from 'bcrypt';
+
 import { userClient } from '../client/index.js';
 import customResponseHandler from '../utils/response-handler.js';
 

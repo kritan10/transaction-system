@@ -1,7 +1,10 @@
+import process from 'node:process';
+
 import express from 'express';
 import { StatusCodes } from 'http-status-codes';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
+
 import { authRouter, balanceRouter, userRouter } from './routes/index.js';
 
 const app = express();

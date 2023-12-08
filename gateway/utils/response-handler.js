@@ -1,8 +1,10 @@
 import { StatusCodes } from 'http-status-codes';
+
 /**
- *
+ * This function is a generic response handler.
  * @param {Error} err the error
  * @param {Response} res the Express response object
+ * @param {any} gRes the gRPC call response object
  */
 function customResponseHandler(err, res, gRes) {
 	if (err) {
