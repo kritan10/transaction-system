@@ -27,6 +27,7 @@
 
 				<!-- append incoming message related to balance request here -->
 				<div id="div-request-balance">
+					<p id="text-qr-expiry-timer"></p>
 					<img id="img-request-qr" src="" />
 				</div>
 			</div>
@@ -72,6 +73,7 @@
 			}
 
 			let currentTransaction = null;
+			let intervalId = null;
 
 			const INIT = 1;
 			const REQUEST_BALANCE = 2;
@@ -79,6 +81,8 @@
 			const TRANSACTION_STATUS = 4;
 			const ACCEPT_TRANSACTION = 5;
 			const REJECT_TRANSACTION = 6;
+			const START_QR_TIMER = 7;
+			const DISSOLVE_QR = 8;
 
 			const inputRequesterUserId = document.getElementById('input-requester-userid');
 			const inputSenderUserId = document.getElementById('input-sender-userid');
@@ -95,6 +99,7 @@
 			const divTransferBalance = document.getElementById('div-transfer-balance');
 			const divTransactionDetails = document.getElementById('div-transfer-balance-transaction-details');
 
+			const textQrExpiryTimer = document.getElementById('text-qr-expiry-timer');
 			const imgRequestQr = document.getElementById('img-request-qr');
 
 			const socket = io('localhost:3001', { ackTimeout: 30000, retries: 3, autoConnect: false });
@@ -106,7 +111,7 @@
 			}
 
 			socket.on(INIT, (socketid, userid) => {
-				let htmlMessage = `Error logging in...`;
+				let htmlMessage = `Error logging in`;
 				if (socketid && userid) htmlMessage = `You are connected as ${userid}. Socket ID: ${socketid}`;
 				divRequestBalance.appendChild(createChildNode('p', htmlMessage));
 			});
@@ -128,6 +133,28 @@
 
 			socket.on(TRANSACTION_STATUS, (message) => {
 				divTransferBalance.appendChild(createChildNode('p', message));
+			});
+
+			socket.on(START_QR_TIMER, (time) => {
+				let seconds = 0;
+				let minutes = time;
+				intervalId = setInterval(() => {
+					textQrExpiryTimer.innerText = `QR Expires in 0${minutes}:${seconds}`;
+					if (seconds == 0) {
+						minutes--;
+						seconds = 59;
+					} else {
+						seconds--;
+					}
+					if (seconds == 0 && minutes == 0) {
+						clearInterval(intervalId);
+					}
+				}, 1000);
+			});
+
+			socket.on(DISSOLVE_QR, () => {
+				clearInterval(intervalId);
+				imgRequestQr.src = '';
 			});
 
 			btnRequest.onclick = () => {
